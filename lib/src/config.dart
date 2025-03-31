@@ -18,14 +18,7 @@ import 'dart:io';
 import 'package:stack_trace/stack_trace.dart';
 
 /// The packages whose stack frames should be folded by [terseChain].
-const _packagesToFold = {
-  'cli_script',
-  'async',
-  'collection',
-  'glob',
-  'path',
-  'string_scanner'
-};
+const _packagesToFold = {'cli_script', 'async', 'collection', 'glob', 'path', 'string_scanner'};
 
 /// Returns whether debug mode is currently active.
 bool get inDebugMode => Zone.current[#_debug] == true;
@@ -40,14 +33,11 @@ void debug(String message) {
 /// mode.
 Chain terseChain(Chain chain) => Zone.current[#_verboseTrace] == true
     ? chain
-    : chain.foldFrames((frame) => _packagesToFold.contains(frame.package),
-        terse: true);
+    : chain.foldFrames((frame) => _packagesToFold.contains(frame.package), terse: true);
 
 /// Runs [callback] with the given configuration values set.
 ///
 /// If [verboseTrace] is `true`, full stack traces will be printed for
 /// exceptions. If [debug] is `true`, extra information will be printed.
-T withConfig<T>(T callback(),
-        {bool verboseTrace = false, bool debug = false}) =>
-    runZoned(callback,
-        zoneValues: {#_debug: debug, #_verboseTrace: verboseTrace});
+T withConfig<T>(T callback(), {bool verboseTrace = false, bool debug = false}) =>
+    runZoned(callback, zoneValues: {#_debug: debug, #_verboseTrace: verboseTrace});

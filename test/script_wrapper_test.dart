@@ -37,8 +37,7 @@ void main() {
     });
 
     test("surfaces an error as a Script error", () {
-      var script = Script.fromByteTransformer(
-          StreamTransformer.fromHandlers(handleData: (_, sink) {
+      var script = Script.fromByteTransformer(StreamTransformer.fromHandlers(handleData: (_, sink) {
         sink.addError("oh no!");
       }));
       script.stdin.add([1, 2, 3]);
@@ -48,9 +47,8 @@ void main() {
   });
 
   group("Script.fromStringTransformer()", () {
-    var transformer = StreamTransformer<String, String>.fromBind((stream) =>
-        stream.map(
-            (string) => String.fromCharCodes(string.runes.toList().reversed)));
+    var transformer = StreamTransformer<String, String>.fromBind(
+        (stream) => stream.map((string) => String.fromCharCodes(string.runes.toList().reversed)));
 
     test("converts data from stdin", () {
       var script = Script.fromLineTransformer(transformer);
@@ -66,8 +64,7 @@ void main() {
     });
 
     test("surfaces an error as a Script error", () {
-      var script = Script.fromByteTransformer(
-          StreamTransformer.fromHandlers(handleData: (_, sink) {
+      var script = Script.fromByteTransformer(StreamTransformer.fromHandlers(handleData: (_, sink) {
         sink.addError("oh no!");
       }));
       script.stdin.writeln("hello!");

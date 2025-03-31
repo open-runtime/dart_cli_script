@@ -44,8 +44,7 @@ const _slugCharacters = 16;
 /// basename. If [suffix] is passed, it's added to the end. If [parent] is
 /// passed, it's used as the parent directory for the path; it defaults to
 /// [Directory.systemTemp].
-T withTempPath<T>(T callback(String path),
-    {String? prefix, String? suffix, String? parent}) {
+T withTempPath<T>(T callback(String path), {String? prefix, String? suffix, String? parent}) {
   var path = _tempPathName(prefix, suffix, parent);
   return tryFinally(() => callback(path), () {
     try {
@@ -89,9 +88,7 @@ Future<T> withTempPathAsync<T>(FutureOr<T> callback(String path),
 /// directory's basename. If [suffix] is passed, it's added to the end. If
 /// [parent] is passed, the temporary directory is created within that path;
 /// otherwise, it's created within [Directory.systemTemp].
-T withTempDir<T>(T callback(String dir),
-        {String? prefix, String? suffix, String? parent}) =>
-    withTempPath((path) {
+T withTempDir<T>(T callback(String dir), {String? prefix, String? suffix, String? parent}) => withTempPath((path) {
       Directory(path).createSync();
       return callback(path);
     }, prefix: prefix, suffix: suffix, parent: parent);
@@ -102,8 +99,7 @@ T withTempDir<T>(T callback(String dir),
 /// Note that even [withTempDir] can safely be used with an asynchronous
 /// [callback]. This function is only necessary if you need the automatic
 /// filesystem operations to be asynchronous.
-Future<T> withTempDirAsync<T>(FutureOr<T> callback(String dir),
-        {String? prefix, String? suffix, String? parent}) =>
+Future<T> withTempDirAsync<T>(FutureOr<T> callback(String dir), {String? prefix, String? suffix, String? parent}) =>
     withTempPathAsync((path) async {
       await Directory(path).create();
       return await callback(path);
@@ -112,10 +108,8 @@ Future<T> withTempDirAsync<T>(FutureOr<T> callback(String dir),
 /// Returns the name of a temporary path within [parent] with the given [prefix]
 /// and [suffix].
 String _tempPathName(String? prefix, String? suffix, String? parent) {
-  var slug = String.fromCharCodes(
-      Iterable.generate(_slugCharacters, (_) => _randomAlphanumeric()));
-  return p.join(parent ?? Directory.systemTemp.path,
-      "${prefix ?? ''}$slug${suffix ?? ''}");
+  var slug = String.fromCharCodes(Iterable.generate(_slugCharacters, (_) => _randomAlphanumeric()));
+  return p.join(parent ?? Directory.systemTemp.path, "${prefix ?? ''}$slug${suffix ?? ''}");
 }
 
 /// Returns a random alphanumeric character.

@@ -60,8 +60,7 @@ T silenceStdout<T>(T callback()) {
   var group = StdioGroup();
   group.stream.drain<void>();
   return runZoned(callback,
-      zoneValues: {stdoutKey: group},
-      zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}));
+      zoneValues: {stdoutKey: group}, zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}));
 }
 
 /// Runs [callback] and silences all stderr emitted by [Script]s.
@@ -102,12 +101,8 @@ T silenceOutput<T>(T callback()) {
 /// callback allows capturing those signals so the callback may react
 /// appropriately. When no [onSignal] handler was set, calling [kill] will do
 /// nothing and return `false`.
-Script silenceUntilFailure(
-    FutureOr<void> Function(Stream<List<int>> stdin) callback,
-    {String? name,
-    bool? when,
-    bool stderrOnly = false,
-    bool onSignal(ProcessSignal signal)?}) {
+Script silenceUntilFailure(FutureOr<void> Function(Stream<List<int>> stdin) callback,
+    {String? name, bool? when, bool stderrOnly = false, bool onSignal(ProcessSignal signal)?}) {
   // Wrap this in an additional [Script.capture] so that we can both handle the
   // failure *and* still have it be top-leveled if it's not handled by the
   // caller.

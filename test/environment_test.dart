@@ -44,10 +44,7 @@ void main() {
         env.remove(varName);
         expect(env, isNot(contains(varName)));
       });
-    },
-        skip: Platform.environment.isEmpty
-            ? "These tests require at least one environment variable to be set"
-            : null);
+    }, skip: Platform.environment.isEmpty ? "These tests require at least one environment variable to be set" : null);
   });
 
   group("withEnv", () {
@@ -70,35 +67,27 @@ void main() {
         expect(env, isNot(contains(varName)));
       });
 
-      test("with includeParentEnvironment: false creates an empty environment",
-          () {
-        withEnv(expectAsync0(() => expect(env, isEmpty)), {},
-            includeParentEnvironment: false);
+      test("with includeParentEnvironment: false creates an empty environment", () {
+        withEnv(expectAsync0(() => expect(env, isEmpty)), {}, includeParentEnvironment: false);
       });
     });
 
     test("overrides outer variables", () {
       var varName = uid();
       env[varName] = "outer value";
-      withEnv(
-          expectAsync0(() => expect(env, containsPair(varName, "inner value"))),
-          {varName: "inner value"});
+      withEnv(expectAsync0(() => expect(env, containsPair(varName, "inner value"))), {varName: "inner value"});
       expect(env, containsPair(varName, "outer value"));
     });
 
     test("removes outer variables with value null", () {
       var varName = uid();
       env[varName] = "outer value";
-      withEnv(expectAsync0(() => expect(env, isNot(contains(varName)))),
-          {varName: null});
+      withEnv(expectAsync0(() => expect(env, isNot(contains(varName)))), {varName: null});
       expect(env, containsPair(varName, "outer value"));
     });
 
-    test("replaces the outer environment with includeParentEnvironment: false",
-        () {
-      withEnv(expectAsync0(() => expect(env, equals({"FOO": "bar"}))),
-          {"FOO": "bar"},
-          includeParentEnvironment: false);
+    test("replaces the outer environment with includeParentEnvironment: false", () {
+      withEnv(expectAsync0(() => expect(env, equals({"FOO": "bar"}))), {"FOO": "bar"}, includeParentEnvironment: false);
     });
   });
 
@@ -121,8 +110,7 @@ void main() {
       var varName = uid();
       env[varName] = "outer value";
       env.remove(varName.toUpperCase());
-      withEnv(
-          expectAsync0(() => expect(env, containsPair(varName, "inner value"))),
+      withEnv(expectAsync0(() => expect(env, containsPair(varName, "inner value"))),
           {varName.toUpperCase(): "inner value"});
     });
   }, testOn: 'windows');

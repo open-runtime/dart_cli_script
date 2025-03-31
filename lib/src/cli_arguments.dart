@@ -73,8 +73,7 @@ class CliArguments {
       var next = scanner.peekChar();
       if (next == $space || next == null) {
         var glob = isGlobActive ? globBuffer?.toString() : null;
-        return _Argument(
-            plainBuffer.toString(), glob == null ? null : Glob(glob));
+        return _Argument(plainBuffer.toString(), glob == null ? null : Glob(glob));
       } else if (next == $double_quote || next == $single_quote) {
         scanner.readChar();
 
@@ -158,8 +157,7 @@ class _Argument {
     if (glob != null) {
       var absolute = p.isAbsolute(glob.pattern);
       var globbed = [
-        await for (var entity in glob.list(root: root))
-          absolute ? entity.path : p.relative(entity.path, from: root)
+        await for (var entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root)
       ];
       if (globbed.isNotEmpty) return globbed;
     }

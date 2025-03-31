@@ -32,31 +32,25 @@ void main() {
     group("both streams emit no events", () {
       test("when listened in the same microtask", () {
         controller1.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0),
-            onDone: expectAsync0(() {}, count: 0));
+            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
         controller2.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0),
-            onDone: expectAsync0(() {}, count: 0));
+            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
       });
 
       test("when listened in separate microtasks", () async {
         controller1.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0),
-            onDone: expectAsync0(() {}, count: 0));
+            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
         await Future<void>.value();
         controller2.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0),
-            onDone: expectAsync0(() {}, count: 0));
+            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
       });
 
       test("when listened in distant microtasks", () async {
         controller1.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0),
-            onDone: expectAsync0(() {}, count: 0));
+            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
         await pumpEventQueue();
         controller2.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0),
-            onDone: expectAsync0(() {}, count: 0));
+            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
       });
     });
 
@@ -141,8 +135,7 @@ void main() {
         }
       });
 
-      test("events added during flushing are also flushed as microtasks",
-          () async {
+      test("events added during flushing are also flushed as microtasks", () async {
         var events = _collectEventsFromBoth(controller1, controller2);
 
         for (var i = 0; i < 4; i++) {
@@ -204,9 +197,7 @@ void main() {
         expect(events2.error(3), equals("2:4"));
       });
 
-      test(
-          "new events for the second controller are buffered until it's listened",
-          () async {
+      test("new events for the second controller are buffered until it's listened", () async {
         _collectEvents(controller1);
         controller2.add("2:5");
         await Future<void>.value();
@@ -236,9 +227,7 @@ void main() {
         expect(events2.error(3), equals("2:4"));
       });
 
-      test(
-          "new events for the second controller are buffered until it's listened",
-          () async {
+      test("new events for the second controller are buffered until it's listened", () async {
         _collectEvents(controller1);
         controller2.add("2:5");
         await pumpEventQueue();
@@ -273,8 +262,7 @@ _CollectedEvents _collectEvents(StreamController<Object> controller) {
 
 /// Returns an object that's updated with events emitted by both [controller1]'s
 /// and [controller2]'s streams.
-_CollectedEvents _collectEventsFromBoth(StreamController<Object> controller1,
-    StreamController<Object> controller2) {
+_CollectedEvents _collectEventsFromBoth(StreamController<Object> controller1, StreamController<Object> controller2) {
   var events = _CollectedEvents();
   _collectEventsInto(controller1, events);
   _collectEventsInto(controller2, events);
@@ -282,10 +270,8 @@ _CollectedEvents _collectEventsFromBoth(StreamController<Object> controller1,
 }
 
 /// Listens to [controller]'s stream and adds all events it emits to [events].
-void _collectEventsInto(
-    StreamController<Object> controller, _CollectedEvents events) {
+void _collectEventsInto(StreamController<Object> controller, _CollectedEvents events) {
   controller.stream.listen((value) => events.events.add(Result.value(value)),
-      onError: (Object error, StackTrace stackTrace) =>
-          events.events.add(Result.error(error, stackTrace)),
+      onError: (Object error, StackTrace stackTrace) => events.events.add(Result.error(error, stackTrace)),
       onDone: () => events.done = true);
 }

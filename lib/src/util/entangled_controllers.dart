@@ -29,8 +29,7 @@ import 'sink_base.dart';
 ///
 /// Note: these controllers are effectively synchronous, and so should only have
 /// events added to them at the end of event loops.
-Tuple2<StreamController<T>, StreamController<T>>
-    createEntangledControllers<T>() {
+Tuple2<StreamController<T>, StreamController<T>> createEntangledControllers<T>() {
   var buffer = _EntangledBuffer<T>();
 
   var controller1 = _EntangledController<T>(buffer, true);
@@ -159,16 +158,14 @@ class _EntangledBuffer<T> {
 
 /// A wrapper that pipes inputs to [_EntangledBuffer] and exposes output from
 /// one of [_EntangledBuffer]'s controllers.
-class _EntangledController<T> extends StreamSinkBase<T>
-    implements StreamController<T> {
+class _EntangledController<T> extends StreamSinkBase<T> implements StreamController<T> {
   /// The buffer that this wraps.
   final _EntangledBuffer<T> _buffer;
 
   /// Whether this is [_buffer.controller1] or [_buffer.controller2].
   final bool _isController1;
 
-  StreamController<T> get _outputController =>
-      _isController1 ? _buffer.controller1 : _buffer.controller2;
+  StreamController<T> get _outputController => _isController1 ? _buffer.controller1 : _buffer.controller2;
 
   Future<void> get done => _outputController.done;
   bool get hasListener => _outputController.hasListener;
@@ -177,12 +174,10 @@ class _EntangledController<T> extends StreamSinkBase<T>
   Stream<T> get stream => _outputController.stream;
 
   FutureOr<void> Function()? get onCancel => _outputController.onCancel;
-  set onCancel(FutureOr<void> Function()? value) =>
-      _outputController.onCancel = value;
+  set onCancel(FutureOr<void> Function()? value) => _outputController.onCancel = value;
 
   void Function()? get onListen => _outputController.onListen;
-  set onListen(void Function()? value) =>
-      throw UnsupportedError("Entangled controllers can't set onListen");
+  set onListen(void Function()? value) => throw UnsupportedError("Entangled controllers can't set onListen");
 
   void Function()? get onPause => _outputController.onPause;
   set onPause(void Function()? value) => _outputController.onPause = value;
@@ -196,8 +191,7 @@ class _EntangledController<T> extends StreamSinkBase<T>
 
   Future<void> addStream(Stream<T> stream, {bool? cancelOnError}) {
     if (cancelOnError == true) {
-      stream = stream.transform(StreamTransformer(
-          (stream, _) => stream.listen(null, cancelOnError: true)));
+      stream = stream.transform(StreamTransformer((stream, _) => stream.listen(null, cancelOnError: true)));
     }
 
     return super.addStream(stream);
@@ -205,8 +199,7 @@ class _EntangledController<T> extends StreamSinkBase<T>
 
   void onAdd(T event) => _buffer.add(_isController1, event);
 
-  void onError(Object error, [StackTrace? stackTrace]) =>
-      _buffer.addError(_isController1, error, stackTrace);
+  void onError(Object error, [StackTrace? stackTrace]) => _buffer.addError(_isController1, error, stackTrace);
 
   void onClose() => _buffer.close(_isController1);
 }

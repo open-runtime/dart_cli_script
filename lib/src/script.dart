@@ -138,8 +138,7 @@ class Script {
   /// Returns a future that completes when this script finishes running, whether
   /// or not it encountered an error and without disrupting the error handling
   /// that would otherwise occur.
-  Future<void> get _doneWithoutError =>
-      _doneCompleter.future.catchError((_) {});
+  Future<void> get _doneWithoutError => _doneCompleter.future.catchError((_) {});
 
   /// The completer for [done].
   ///
@@ -209,10 +208,7 @@ class Script {
             : withEnv(() => env, environment!);
       }
 
-      var allArgs = [
-        ...await parsedExecutableAndArgs.arguments(root: workingDirectory),
-        ...?args
-      ];
+      var allArgs = [...await parsedExecutableAndArgs.arguments(root: workingDirectory), ...?args];
 
       if (inDebugMode) {
         // dart-lang/language#1536
@@ -231,8 +227,7 @@ class Script {
       // process started.
       if (capturedSignal != null) process!.kill(capturedSignal!);
 
-      return ScriptComponents(
-          process!.stdin, process!.stdout, process!.stderr, process!.exitCode);
+      return ScriptComponents(process!.stdin, process!.stdout, process!.stderr, process!.exitCode);
     }, (signal) {
       if (process != null) return process!.kill(signal);
       capturedSignal = signal;
@@ -279,10 +274,8 @@ class Script {
   /// callback allows capturing those signals so the callback may react
   /// appropriately. When no [onSignal] handler was set, calling [kill] will do
   /// nothing and return `false`.
-  factory Script.capture(
-      FutureOr<void> Function(Stream<List<int>> stdin) callback,
-      {String? name,
-      bool onSignal(ProcessSignal signal)?}) {
+  factory Script.capture(FutureOr<void> Function(Stream<List<int>> stdin) callback,
+      {String? name, bool onSignal(ProcessSignal signal)?}) {
     _checkCapture();
 
     var scriptName = name ?? "capture";
@@ -333,8 +326,8 @@ class Script {
           if (!exitCodeCompleter.isCompleted) stdoutGroup.writeln(line);
         }));
 
-    return Script._(scriptName, stdinController.sink, stdoutGroup.stream,
-        stderrGroup.stream, exitCodeCompleter.future, (signal) {
+    return Script._(scriptName, stdinController.sink, stdoutGroup.stream, stderrGroup.stream, exitCodeCompleter.future,
+        (signal) {
       if (onSignal == null) return false;
       return onSignal!(signal);
     });
@@ -349,9 +342,7 @@ class Script {
   /// [Script.kill] returns `true` if the stream was interrupted and the script
   /// exits with [Script.exitCode] `143`, or `false` if the stream was already
   /// closed.
-  factory Script.fromByteTransformer(
-      StreamTransformer<List<int>, List<int>> transformer,
-      {String? name}) {
+  factory Script.fromByteTransformer(StreamTransformer<List<int>, List<int>> transformer, {String? name}) {
     _checkCapture();
     var controller = StreamController<List<int>>();
     var exitCodeCompleter = Completer<int>.sync();
@@ -360,8 +351,10 @@ class Script {
     return Script._(
       name ?? transformer.toString(),
       controller.sink,
-      controller.stream.transform(signalCloser).transform(transformer).onDone(
-          () => exitCodeCompleter.complete(signalCloser.isClosed ? 143 : 0)),
+      controller.stream
+          .transform(signalCloser)
+          .transform(transformer)
+          .onDone(() => exitCodeCompleter.complete(signalCloser.isClosed ? 143 : 0)),
       Stream.empty(),
       exitCodeCompleter.future,
       (_) {
@@ -380,23 +373,18 @@ class Script {
   /// [Script.kill] returns `true` if the stream was interrupted and the script
   /// exits with [Script.exitCode] `143`, or `false` if the stream was already
   /// closed.
-  factory Script.fromLineTransformer(
-          StreamTransformer<String, String> transformer,
-          {String? name}) =>
+  factory Script.fromLineTransformer(StreamTransformer<String, String> transformer, {String? name}) =>
       Script.fromByteTransformer(
-          StreamTransformer.fromBind((stream) => stream.lines
-              .transform(transformer)
-              .map<List<int>>((line) => utf8.encode("$line\n"))),
+          StreamTransformer.fromBind(
+              (stream) => stream.lines.transform(transformer).map<List<int>>((line) => utf8.encode("$line\n"))),
           name: name ?? transformer.toString());
 
   /// Creates a [Script] from a function that maps strings to strings.
   ///
   /// This script passes each line of stdin to [mapper] and emits the result via
   /// stdout.
-  factory Script.mapLines(String Function(String line) mapper,
-          {String? name}) =>
-      Script.fromLineTransformer(
-          StreamTransformer.fromBind((stream) => stream.map(mapper)),
+  factory Script.mapLines(String Function(String line) mapper, {String? name}) =>
+      Script.fromLineTransformer(StreamTransformer.fromBind((stream) => stream.map(mapper)),
           name: name ?? mapper.toString());
 
   /// Pipes each script's [stdout] into the next script's [stdin].
@@ -443,8 +431,8 @@ class Script {
         // to top-level the streams' output.
         SubscriptionStream(list.last.stdout.listen(null)),
         SubscriptionStream(list.last.stderr.listen(null)),
-        Future.wait(list.map((script) => script.exitCode)).then((exitCodes) =>
-            exitCodes.lastWhere((code) => code != 0, orElse: () => 0)),
+        Future.wait(list.map((script) => script.exitCode))
+            .then((exitCodes) => exitCodes.lastWhere((code) => code != 0, orElse: () => 0)),
         (signal) => list.any((script) => script.kill(signal)));
   }
 
@@ -460,8 +448,7 @@ class Script {
     } else if (scriptlike is String Function(String)) {
       return Script.mapLines(scriptlike);
     } else {
-      throw ArgumentError(
-          "$scriptlike is not a Script and can't be converted to one.");
+      throw ArgumentError("$scriptlike is not a Script and can't be converted to one.");
     }
   }
 
@@ -485,10 +472,8 @@ class Script {
   /// callback allows capturing those signals so the callback may react
   /// appropriately. When no [onSignal] handler was set, calling [kill] will do
   /// nothing and return `false`.
-  Script.fromComponents(String name, FutureOr<ScriptComponents> callback(),
-      {bool onSignal(ProcessSignal signal)?})
-      : this.fromComponentsInternal(name, callback, onSignal ?? (_) => false,
-            silenceStartMessage: false);
+  Script.fromComponents(String name, FutureOr<ScriptComponents> callback(), {bool onSignal(ProcessSignal signal)?})
+      : this.fromComponentsInternal(name, callback, onSignal ?? (_) => false, silenceStartMessage: false);
 
   /// Like [Script.fromComponents], but with an internal [silenceStartMessage]
   /// option that's forwarded to [Script._].
@@ -496,18 +481,10 @@ class Script {
   /// @nodoc
   @internal
   Script.fromComponentsInternal(
-      String name,
-      FutureOr<ScriptComponents> callback(),
-      bool signalHandler(ProcessSignal signal),
+      String name, FutureOr<ScriptComponents> callback(), bool signalHandler(ProcessSignal signal),
       {required bool silenceStartMessage})
       : this._fromComponentsInternal(
-            _checkCapture(),
-            name,
-            callback,
-            StreamCompleter(),
-            StreamCompleter(),
-            StreamSinkCompleter(),
-            signalHandler,
+            _checkCapture(), name, callback, StreamCompleter(), StreamCompleter(), StreamSinkCompleter(), signalHandler,
             silenceStartMessage: silenceStartMessage);
 
   /// A helper method for [Script.fromComponentsInternal] that takes a bunch of
@@ -544,8 +521,7 @@ class Script {
 
   /// Pipes [stream]'s events to a [StdioGroup] indexed by [key] in the current
   /// zone if it exists, or else to [defaultConsumer] if it doesn't.
-  static void _pipeUnlistenedStream(
-      Stream<List<int>> stream, Object key, Sink<List<int>> defaultConsumer) {
+  static void _pipeUnlistenedStream(Stream<List<int>> stream, Object key, Sink<List<int>> defaultConsumer) {
     var group = Zone.current[key];
     if (group is StdioGroup) {
       group.add(stream);
@@ -558,17 +534,15 @@ class Script {
   ///
   /// If [silenceStartMessage] is `false` (the default), this prints a message
   /// in debug mode indicating that the script has started running.
-  Script._(this.name, StreamSink<List<int>> stdin, Stream<List<int>> stdout,
-      Stream<List<int>> stderr, Future<int> exitCode, this._signalHandler,
+  Script._(this.name, StreamSink<List<int>> stdin, Stream<List<int>> stdout, Stream<List<int>> stderr,
+      Future<int> exitCode, this._signalHandler,
       {bool silenceStartMessage = false}) {
-    this.stdin = IOSink(stdin
-        .transform(StreamSinkTransformer.fromStreamTransformer(_stdinCloser)));
+    this.stdin = IOSink(stdin.transform(StreamSinkTransformer.fromStreamTransformer(_stdinCloser)));
     if (!silenceStartMessage) debug("[$name] starting");
 
     _stdout = stdout.handleError(_handleError).transform(_outputCloser);
-    _stderr = StreamGroup.merge([stderr, _extraStderrController.stream])
-        .handleError(_handleError)
-        .transform(_outputCloser);
+    _stderr =
+        StreamGroup.merge([stderr, _extraStderrController.stream]).handleError(_handleError).transform(_outputCloser);
 
     // Add an extra [Future.then] so that any errors passed to [_doneCompleter]
     // will still be top-leveled unless [done] specifically has a listener,
@@ -583,8 +557,7 @@ class Script {
         _doneCompleter.complete(null);
       } else {
         debug("[$name] exited with exit code $code");
-        _doneCompleter.completeError(
-            ScriptException(name, code), StackTrace.current);
+        _doneCompleter.completeError(ScriptException(name, code), StackTrace.current);
       }
 
       _closeOutputStreams();
@@ -660,11 +633,7 @@ class Script {
       var chain = terseChain(Chain.forTrace(trace));
       if (inDebugMode) {
         debug("[$name] exited with Dart exception:\n" +
-            "$error\n$chain"
-                .trimRight()
-                .split("\n")
-                .map((line) => "| $line")
-                .join("\n"));
+            "$error\n$chain".trimRight().split("\n").map((line) => "| $line").join("\n"));
       }
 
       // Otherwise, if this is an unexpected Dart error, print information about
@@ -675,8 +644,7 @@ class Script {
           "$error\n"
           "$chain\n"));
       _extraStderrController.close();
-      _doneCompleter.completeError(
-          ScriptException(name, 257), StackTrace.current);
+      _doneCompleter.completeError(ScriptException(name, 257), StackTrace.current);
     }
 
     _closeOutputStreams();
@@ -697,22 +665,19 @@ class Script {
   ///
   /// Like `stdout.text`, but throws a [ScriptException] if the executable
   /// returns a non-zero exit code.
-  Future<String> get output async =>
-      (await Future.wait([stdout.text, done]))[0] as String;
+  Future<String> get output async => (await Future.wait([stdout.text, done]))[0] as String;
 
   /// Returns this script's stdout as bytes.
   ///
   /// Like `collectBytes(stdout)`, but throws a [ScriptException] if the
   /// executable returns a non-zero exit code.
-  Future<Uint8List> get outputBytes async =>
-      (await Future.wait([collectBytes(stdout), done]))[0] as Uint8List;
+  Future<Uint8List> get outputBytes async => (await Future.wait([collectBytes(stdout), done]))[0] as Uint8List;
 
   /// Returns a stream of lines [this] prints to stdout.
   ///
   /// Like [stdout.lines], but emits a [ScriptException] if the executable
   /// returns a non-zero exit code.
-  Stream<String> get lines =>
-      StreamGroup.merge([stdout.lines, Stream.fromFuture(done).withoutData()]);
+  Stream<String> get lines => StreamGroup.merge([stdout.lines, Stream.fromFuture(done).withoutData()]);
 
   /// Returns a stream that combines both [stdout] and [stderr] the same way
   /// they'd be displayed in a terminal.
@@ -739,8 +704,7 @@ class Script {
   Script operator |(Object other) => Script.pipeline([this, other]);
 
   /// Shorthand for `script.stdout.pipe(consumer)`.
-  Future<void> operator >(StreamConsumer<List<int>> consumer) =>
-      stdout.pipe(consumer);
+  Future<void> operator >(StreamConsumer<List<int>> consumer) => stdout.pipe(consumer);
 }
 
 /// A struct containing the components needed to create a [Script].

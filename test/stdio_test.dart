@@ -37,8 +37,7 @@ void main() {
       test("started asynchronously", () {
         expect(
             Script.capture((_) {
-              silenceStdout(() =>
-                  scheduleMicrotask(() => mainScript("print('howdy!');")));
+              silenceStdout(() => scheduleMicrotask(() => mainScript("print('howdy!');")));
             }).stdout,
             emitsDone);
       });
@@ -74,8 +73,7 @@ void main() {
       test("asynchronously", () {
         expect(
             Script.capture((_) {
-              silenceStdout(() =>
-                  scheduleMicrotask(() => currentStdout.writeln('howdy!')));
+              silenceStdout(() => scheduleMicrotask(() => currentStdout.writeln('howdy!')));
             }).stdout,
             emitsDone);
       });
@@ -95,8 +93,7 @@ void main() {
       test("started asynchronously", () {
         expect(
             Script.capture((_) {
-              silenceStderr(() => scheduleMicrotask(
-                  () => mainScript("stderr.writeln('howdy!');")));
+              silenceStderr(() => scheduleMicrotask(() => mainScript("stderr.writeln('howdy!');")));
             }).stderr,
             emitsDone);
       });
@@ -114,8 +111,7 @@ void main() {
       test("asynchronously", () {
         expect(
             Script.capture((_) {
-              silenceStderr(() =>
-                  scheduleMicrotask(() => currentStderr.writeln('howdy!')));
+              silenceStderr(() => scheduleMicrotask(() => currentStderr.writeln('howdy!')));
             }).stderr,
             emitsDone);
       });
@@ -177,8 +173,7 @@ void main() {
       test("asynchronously", () {
         expect(
             Script.capture((_) {
-              silenceOutput(() =>
-                  scheduleMicrotask(() => currentStdout.writeln('howdy!')));
+              silenceOutput(() => scheduleMicrotask(() => currentStdout.writeln('howdy!')));
             }).combineOutput(),
             emitsDone);
       });
@@ -196,8 +191,7 @@ void main() {
       test("asynchronously", () {
         expect(
             Script.capture((_) {
-              silenceOutput(() =>
-                  scheduleMicrotask(() => currentStderr.writeln('howdy!')));
+              silenceOutput(() => scheduleMicrotask(() => currentStderr.writeln('howdy!')));
             }).combineOutput(),
             emitsDone);
       });
@@ -221,8 +215,7 @@ void main() {
         test("started asynchronously", () {
           expect(
               Script.capture((_) {
-                silenceUntilFailure(
-                    (_) => scheduleMicrotask(() => mainScript("""
+                silenceUntilFailure((_) => scheduleMicrotask(() => mainScript("""
                       print('howdy!');
                       stderr.writeln('howdy!');
                     """)));
@@ -243,8 +236,7 @@ void main() {
         test("asynchronously", () {
           expect(
               Script.capture((_) {
-                silenceUntilFailure(
-                    (_) => scheduleMicrotask(() => print('howdy!')));
+                silenceUntilFailure((_) => scheduleMicrotask(() => print('howdy!')));
               }).combineOutput(),
               emitsDone);
         });
@@ -262,8 +254,7 @@ void main() {
         test("asynchronously", () {
           expect(
               Script.capture((_) {
-                silenceUntilFailure((_) =>
-                    scheduleMicrotask(() => currentStdout.writeln('howdy!')));
+                silenceUntilFailure((_) => scheduleMicrotask(() => currentStdout.writeln('howdy!')));
               }).combineOutput(),
               emitsDone);
         });
@@ -281,8 +272,7 @@ void main() {
         test("asynchronously", () {
           expect(
               Script.capture((_) {
-                silenceUntilFailure((_) =>
-                    scheduleMicrotask(() => currentStderr.writeln('howdy!')));
+                silenceUntilFailure((_) => scheduleMicrotask(() => currentStderr.writeln('howdy!')));
               }).combineOutput(),
               emitsDone);
         });
@@ -326,8 +316,7 @@ void main() {
 
   test("a script cancels its stdin subscription when it exits", () async {
     var canceled = false;
-    var controller =
-        StreamController<List<int>>(onCancel: () => canceled = true);
+    var controller = StreamController<List<int>>(onCancel: () => canceled = true);
     var script = Script.capture((_) => Future.delayed(Duration.zero));
     controller.stream | script;
 

@@ -28,8 +28,7 @@ import '../util.dart';
 /// (as commonly emitted by a shell script).
 extension LineStreamExtensions on Stream<String> {
   /// Converts this to a byte stream with newlines baked in.
-  Stream<List<int>> get bytes =>
-      map<List<int>>((line) => utf8.encode("$line\n"));
+  Stream<List<int>> get bytes => map<List<int>>((line) => utf8.encode("$line\n"));
 
   /// Pipes [this] into [script]'s [stdin] with newlines baked in.
   ///
@@ -40,8 +39,7 @@ extension LineStreamExtensions on Stream<String> {
   Script operator |(Script script) => bytes | script;
 
   /// Shorthand for `stream.bytes.pipe`.
-  Future<void> operator >(StreamConsumer<List<int>> consumer) =>
-      bytes.pipe(consumer);
+  Future<void> operator >(StreamConsumer<List<int>> consumer) => bytes.pipe(consumer);
 
   /// Returns a stream of lines along with [FileSpan]s indicating the position
   /// of those lines within the original source (assuming that this stream is
@@ -53,8 +51,7 @@ extension LineStreamExtensions on Stream<String> {
   /// not both be passed at once.
   ///
   /// See [LineAndSpanStreamExtensions].
-  Stream<Tuple2<String, SourceSpanWithContext>> withSpans(
-      {Uri? sourceUrl, String? sourcePath}) {
+  Stream<Tuple2<String, SourceSpanWithContext>> withSpans({Uri? sourceUrl, String? sourcePath}) {
     if (sourcePath != null) {
       if (sourceUrl != null) {
         throw ArgumentError("Only one of url and path may be passed.");
@@ -66,10 +63,8 @@ extension LineStreamExtensions on Stream<String> {
     var offset = 0;
     return map((line) {
       var span = SourceSpanWithContext(
-          SourceLocation(offset,
-              sourceUrl: sourceUrl, line: lineNumber, column: 0),
-          SourceLocation(offset + line.length,
-              sourceUrl: sourceUrl, line: lineNumber, column: line.length),
+          SourceLocation(offset, sourceUrl: sourceUrl, line: lineNumber, column: 0),
+          SourceLocation(offset + line.length, sourceUrl: sourceUrl, line: lineNumber, column: line.length),
           line,
           line);
       lineNumber++;
@@ -96,18 +91,13 @@ extension LineStreamExtensions on Stream<String> {
       bool unicode = false,
       bool dotAll = false}) {
     if (exclude && onlyMatching) {
-      throw ArgumentError(
-          "The exclude and onlyMatching flags can't both be set");
+      throw ArgumentError("The exclude and onlyMatching flags can't both be set");
     }
 
-    var pattern = RegExp(regexp,
-        caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
     return onlyMatching
-        ? expand((line) => pattern
-            .allMatches(line)
-            .map((match) => match.group(0)!)
-            .where((match) => match.isNotEmpty))
+        ? expand((line) => pattern.allMatches(line).map((match) => match.group(0)!).where((match) => match.isNotEmpty))
         : where((line) => pattern.hasMatch(line) != exclude);
   }
 
@@ -123,15 +113,9 @@ extension LineStreamExtensions on Stream<String> {
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [new RegExp].
   Stream<String> replace(String regexp, String replacement,
-          {bool all = false,
-          bool caseSensitive = true,
-          bool unicode = false,
-          bool dotAll = false}) =>
+          {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
       replaceMapped(regexp, (match) => replaceMatch(match, replacement),
-          all: all,
-          caseSensitive: caseSensitive,
-          unicode: unicode,
-          dotAll: dotAll);
+          all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
   /// Replaces matches of [regexp] with the result of calling [replace].
   ///
@@ -141,15 +125,9 @@ extension LineStreamExtensions on Stream<String> {
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [new RegExp].
   Stream<String> replaceMapped(String regexp, String replace(Match match),
-      {bool all = false,
-      bool caseSensitive = true,
-      bool unicode = false,
-      bool dotAll = false}) {
-    var pattern = RegExp(regexp,
-        caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
-    return map((line) => all
-        ? line.replaceAllMapped(pattern, replace)
-        : line.replaceFirstMapped(pattern, replace));
+      {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) {
+    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    return map((line) => all ? line.replaceAllMapped(pattern, replace) : line.replaceFirstMapped(pattern, replace));
   }
 
   /// Returns a stream that emits the same events as this one, but also prints
@@ -200,8 +178,7 @@ extension LineStreamExtensions on Stream<String> {
 
     var signalCloser = StreamCloser<String>();
     var self = transform(signalCloser);
-    var chunks =
-        maxArgs != null ? self.slices(maxArgs) : self.toList().asStream();
+    var chunks = maxArgs != null ? self.slices(maxArgs) : self.toList().asStream();
 
     return Script.capture(
         (_) async {

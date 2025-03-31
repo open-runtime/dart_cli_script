@@ -32,16 +32,14 @@ void main() {
   });
 
   test("pipes the pipeline's stdin into the first script's stdin", () {
-    var pipeline = mainScript('print("a: " + stdin.readLineSync()!);') |
-        mainScript('print("b: " + stdin.readLineSync()!);');
+    var pipeline =
+        mainScript('print("a: " + stdin.readLineSync()!);') | mainScript('print("b: " + stdin.readLineSync()!);');
     pipeline.stdin.writeln("hello!");
     expect(pipeline.stdout.lines, emits("b: a: hello!"));
   });
 
   test("pipes a scriptlike object", () {
-    var pipeline =
-        mainScript('stdout.add(zlib.encode(utf8.encode("hello!")));') |
-            zlib.decoder;
+    var pipeline = mainScript('stdout.add(zlib.encode(utf8.encode("hello!")));') | zlib.decoder;
     expect(pipeline.stdout.lines, emits("hello!"));
   });
 
@@ -70,8 +68,7 @@ void main() {
   test("only includes the last script's stderr in the pipeline's", () {
     late Script pipeline;
     var captured = Script.capture((_) {
-      pipeline = mainScript('stderr.writeln("script 1");') |
-          mainScript('stderr.writeln("script 2");');
+      pipeline = mainScript('stderr.writeln("script 1");') | mainScript('stderr.writeln("script 2");');
     });
 
     expect(captured.stderr.lines, emits("script 1"));
@@ -114,8 +111,7 @@ void main() {
     });
 
     group("if one fails", () {
-      group("waits for both scripts to exit and returns the failing exit code",
-          () {
+      group("waits for both scripts to exit and returns the failing exit code", () {
         group("if the first exits first", () {
           test("and the first fails", () async {
             var completer = Completer<void>();
@@ -276,8 +272,7 @@ void main() {
       test(
           "the error isn't top-leveled if it's handled only at the pipeline "
           "level", () async {
-        var pipeline =
-            mainScript("exitCode = 1;") | mainScript("exitCode = 2;");
+        var pipeline = mainScript("exitCode = 1;") | mainScript("exitCode = 2;");
         expect(await pipeline.exitCode, equals(2));
 
         // Give time for an unhandled error to be top-leveled.
@@ -289,8 +284,7 @@ void main() {
   group("pipes in", () {
     group("a byte stream", () {
       test("without errors", () {
-        var pipeline = Stream<List<int>>.fromIterable(
-                [utf8.encode("foo"), utf8.encode("bar")]) |
+        var pipeline = Stream<List<int>>.fromIterable([utf8.encode("foo"), utf8.encode("bar")]) |
             mainScript("stdin.pipe(stdout);");
         expect(pipeline.stdout.lines, emitsInOrder(["foobar", emitsDone]));
       });
@@ -308,8 +302,7 @@ void main() {
 
     group("a string stream", () {
       test("without errors", () {
-        var pipeline = Stream.fromIterable(["foo", "bar"]) |
-            mainScript("stdin.pipe(stdout);");
+        var pipeline = Stream.fromIterable(["foo", "bar"]) | mainScript("stdin.pipe(stdout);");
         expect(pipeline.stdout.lines, emitsInOrder(["foo", "bar", emitsDone]));
       });
 
@@ -324,8 +317,7 @@ void main() {
     });
 
     test("a chunk list", () {
-      var pipeline = [utf8.encode("foo"), utf8.encode("bar")] |
-          mainScript("stdin.pipe(stdout);");
+      var pipeline = [utf8.encode("foo"), utf8.encode("bar")] | mainScript("stdin.pipe(stdout);");
       expect(pipeline.stdout.lines, emitsInOrder(["foobar", emitsDone]));
     });
 

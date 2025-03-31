@@ -118,8 +118,7 @@ void main() {
             print("stdout 4");
             currentStdout.writeln("stdout 5");
           }).combineOutput().lines,
-          emitsInOrder(
-              ["stdout 1", "stdout 2", "stdout 3", "stdout 4", "stdout 5"]));
+          emitsInOrder(["stdout 1", "stdout 2", "stdout 3", "stdout 4", "stdout 5"]));
     });
     test("asynchronously", () {
       expect(
@@ -131,8 +130,7 @@ void main() {
             print("stdout 4");
             currentStdout.writeln("stdout 5");
           }).combineOutput().lines,
-          emitsInOrder(
-              ["stdout 1", "stdout 2", "stdout 3", "stdout 4", "stdout 5"]));
+          emitsInOrder(["stdout 1", "stdout 2", "stdout 3", "stdout 4", "stdout 5"]));
     });
   });
 
@@ -148,15 +146,7 @@ void main() {
             currentStdout.writeln("stdout 4");
             currentStderr.writeln("stderr 3");
           }).combineOutput().lines,
-          emitsInOrder([
-            "stdout 1",
-            "stderr 1",
-            "stdout 2",
-            "stderr 2",
-            "stdout 3",
-            "stdout 4",
-            "stderr 3"
-          ]));
+          emitsInOrder(["stdout 1", "stderr 1", "stdout 2", "stderr 2", "stdout 3", "stdout 4", "stderr 3"]));
     });
 
     test("asynchronously", () {
@@ -171,15 +161,7 @@ void main() {
             currentStdout.writeln("stdout 4");
             currentStderr.writeln("stderr 3");
           }).combineOutput().lines,
-          emitsInOrder([
-            "stdout 1",
-            "stderr 1",
-            "stdout 2",
-            "stderr 2",
-            "stdout 3",
-            "stdout 4",
-            "stderr 3"
-          ]));
+          emitsInOrder(["stdout 1", "stderr 1", "stdout 2", "stderr 2", "stdout 3", "stdout 4", "stderr 3"]));
     });
   });
 
@@ -207,8 +189,7 @@ void main() {
     });
 
     test("completes with the given exit code when fail() is called", () {
-      var script =
-          Script.capture((_) => cli_script.fail("oh no", exitCode: 42));
+      var script = Script.capture((_) => cli_script.fail("oh no", exitCode: 42));
       script.stderr.drain<void>();
       expect(script.exitCode, completion(equals(42)));
     });
@@ -223,9 +204,7 @@ void main() {
       });
 
       test("when the child's done future is piped through the callback", () {
-        expect(
-            Script.capture((_) => mainScript("exitCode = 123;").done).exitCode,
-            completion(equals(123)));
+        expect(Script.capture((_) => mainScript("exitCode = 123;").done).exitCode, completion(equals(123)));
       });
 
       test("when the child's done future error is top-leveled", () {
@@ -247,9 +226,7 @@ void main() {
       });
 
       test("when the child's done future exception is handled in-band", () {
-        expect(
-            Script.capture((_) =>
-                mainScript("exitCode = 123;").done.catchError((_) {})).exitCode,
+        expect(Script.capture((_) => mainScript("exitCode = 123;").done.catchError((_) {})).exitCode,
             completion(equals(0)));
       });
 

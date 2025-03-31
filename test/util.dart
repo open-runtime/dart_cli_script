@@ -77,5 +77,4 @@ Matcher isScriptException(int exitCode) => predicate((error) {
 
 /// Returns a matcher that verifies that the object throws a [ScriptException]
 /// with the given exit code.
-Matcher throwsScriptException(int exitCode) =>
-    throwsA(isScriptException(exitCode));
+Matcher throwsScriptException(int exitCode) => throwsA(isScriptException(exitCode));

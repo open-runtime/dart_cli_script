@@ -16,8 +16,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:async/async.dart'
-    hide EventSinkBase, StreamSinkBase, IOSinkBase;
+import 'package:async/async.dart' hide EventSinkBase, StreamSinkBase, IOSinkBase;
 import 'package:meta/meta.dart';
 
 // These classes were copied here from the `async` package, where they were
@@ -75,8 +74,7 @@ abstract class EventSinkBase<T> implements EventSink<T> {
 ///
 /// This takes care of ensuring that events can't be added after [close] is
 /// called or during a call to [onStream].
-abstract class StreamSinkBase<T> extends EventSinkBase<T>
-    implements StreamSink<T> {
+abstract class StreamSinkBase<T> extends EventSinkBase<T> implements StreamSink<T> {
   /// Whether a call to [addStream] is ongoing.
   bool _addingStream = false;
 

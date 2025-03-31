@@ -84,16 +84,8 @@ void main() {
       currentStderr.writeln("stderr 3");
     });
 
-    expect(
-        script.combineOutput().lines,
-        emitsInOrder([
-          "stdout 1",
-          "stderr 1",
-          "stdout 2",
-          "stderr 2",
-          "stdout 3",
-          "stderr 3"
-        ]));
+    expect(script.combineOutput().lines,
+        emitsInOrder(["stdout 1", "stderr 1", "stdout 2", "stderr 2", "stdout 3", "stderr 3"]));
 
     await pumpEventQueue();
     await script.release();

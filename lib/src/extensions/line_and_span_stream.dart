@@ -23,8 +23,7 @@ import '../util.dart';
 /// Extensions on [Stream<Tuple2<String, SourceSpanWithContext>>] that treat it
 /// as a stream of discrete lines associated with spans that indicate where the
 /// lines came from originally.
-extension LineAndSpanStreamExtensions
-    on Stream<Tuple2<String, SourceSpanWithContext>> {
+extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithContext>> {
   /// Returns the stream of lines alone.
   Stream<String> get lines => map((tuple) => tuple.item1);
 
@@ -46,18 +45,15 @@ extension LineAndSpanStreamExtensions
       bool unicode = false,
       bool dotAll = false}) {
     if (exclude && onlyMatching) {
-      throw ArgumentError(
-          "The exclude and onlyMatching flags can't both be set");
+      throw ArgumentError("The exclude and onlyMatching flags can't both be set");
     }
 
-    var pattern = RegExp(regexp,
-        caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
     return onlyMatching
         ? expand((tuple) => pattern
             .allMatches(tuple.item1)
-            .map((match) => Tuple2(
-                match.group(0)!, tuple.item2.subspan(match.start, match.end)))
+            .map((match) => Tuple2(match.group(0)!, tuple.item2.subspan(match.start, match.end)))
             .where((tuple) => tuple.item1.isNotEmpty))
         : where((tuple) => pattern.hasMatch(tuple.item1) != exclude);
   }
@@ -73,17 +69,10 @@ extension LineAndSpanStreamExtensions
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [new RegExp].
-  Stream<Tuple2<String, SourceSpanWithContext>> replace(
-          String regexp, String replacement,
-          {bool all = false,
-          bool caseSensitive = true,
-          bool unicode = false,
-          bool dotAll = false}) =>
+  Stream<Tuple2<String, SourceSpanWithContext>> replace(String regexp, String replacement,
+          {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
       replaceMapped(regexp, (match) => replaceMatch(match, replacement),
-          all: all,
-          caseSensitive: caseSensitive,
-          unicode: unicode,
-          dotAll: dotAll);
+          all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
   /// Replaces matches of [regexp] with the result of calling [replace].
   ///
@@ -92,32 +81,24 @@ extension LineAndSpanStreamExtensions
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [new RegExp].
-  Stream<Tuple2<String, SourceSpanWithContext>> replaceMapped(
-      String regexp, String replace(Match match),
-      {bool all = false,
-      bool caseSensitive = true,
-      bool unicode = false,
-      bool dotAll = false}) {
-    var pattern = RegExp(regexp,
-        caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
-    return mapLines((line) => all
-        ? line.replaceAllMapped(pattern, replace)
-        : line.replaceFirstMapped(pattern, replace));
+  Stream<Tuple2<String, SourceSpanWithContext>> replaceMapped(String regexp, String replace(Match match),
+      {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) {
+    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    return mapLines(
+        (line) => all ? line.replaceAllMapped(pattern, replace) : line.replaceFirstMapped(pattern, replace));
   }
 
   /// Returns a stream that emits the same events as this one, but also prints
   /// each string to [currentStderr].
   ///
   /// This is primarily intended for debugging.
-  Stream<Tuple2<String, SourceSpanWithContext>> get teeToStderr =>
-      mapLines((line) {
+  Stream<Tuple2<String, SourceSpanWithContext>> get teeToStderr => mapLines((line) {
         currentStderr.writeln(line);
         return line;
       });
 
   /// Like [Stream.map], but only applies the callback to the lines and not the
   /// spans.
-  Stream<Tuple2<String, SourceSpanWithContext>> mapLines(
-          String Function(String line) callback) =>
+  Stream<Tuple2<String, SourceSpanWithContext>> mapLines(String Function(String line) callback) =>
       map((tuple) => Tuple2(callback(tuple.item1), tuple.item2));
 }

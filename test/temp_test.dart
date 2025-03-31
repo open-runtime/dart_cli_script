@@ -29,8 +29,7 @@ void main() {
 
     test("passes a path that doesn't exist", () {
       withTempPath((path) {
-        expect(FileSystemEntity.typeSync(path),
-            equals(FileSystemEntityType.notFound));
+        expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
       });
     });
 
@@ -47,8 +46,7 @@ void main() {
     });
 
     test("adds the prefix to the path", () {
-      withTempPath((path) => expect(p.basename(path), startsWith("foo-")),
-          prefix: "foo-");
+      withTempPath((path) => expect(p.basename(path), startsWith("foo-")), prefix: "foo-");
     });
 
     test("adds the suffix to the path", () {
@@ -56,13 +54,11 @@ void main() {
     });
 
     test("puts the path in Directory.systemTemp by default", () {
-      withTempPath((path) =>
-          expect(p.isWithin(Directory.systemTemp.path, path), isTrue));
+      withTempPath((path) => expect(p.isWithin(Directory.systemTemp.path, path), isTrue));
     });
 
     test("puts the path in parent", () {
-      withTempPath((path) => expect(p.isWithin(d.sandbox, path), isTrue),
-          parent: d.sandbox);
+      withTempPath((path) => expect(p.isWithin(d.sandbox, path), isTrue), parent: d.sandbox);
     });
 
     group("returns the callback's return value", () {
@@ -84,8 +80,7 @@ void main() {
             File(path).writeAsStringSync("hello!");
           });
 
-          expect(FileSystemEntity.typeSync(path),
-              equals(FileSystemEntityType.notFound));
+          expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
         });
 
         test("if the callback throws", () {
@@ -97,8 +92,7 @@ void main() {
             });
           }, throwsA("oh no"));
 
-          expect(FileSystemEntity.typeSync(path),
-              equals(FileSystemEntityType.notFound));
+          expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
         });
       });
 
@@ -115,8 +109,7 @@ void main() {
 
           completer.complete();
           await future;
-          expect(FileSystemEntity.typeSync(path),
-              equals(FileSystemEntityType.notFound));
+          expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
         });
 
         test("if the callback throws", () async {
@@ -131,8 +124,7 @@ void main() {
 
           completer.completeError("oh no");
           await expectLater(future, throwsA("oh no"));
-          expect(FileSystemEntity.typeSync(path),
-              equals(FileSystemEntityType.notFound));
+          expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
         });
       });
     });
@@ -145,8 +137,7 @@ void main() {
 
     test("passes a path that doesn't exist", () async {
       await withTempPathAsync((path) {
-        expect(FileSystemEntity.typeSync(path),
-            equals(FileSystemEntityType.notFound));
+        expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
       });
     });
 
@@ -163,30 +154,23 @@ void main() {
     });
 
     test("adds the prefix to the path", () async {
-      await withTempPathAsync(
-          (path) => expect(p.basename(path), startsWith("foo-")),
-          prefix: "foo-");
+      await withTempPathAsync((path) => expect(p.basename(path), startsWith("foo-")), prefix: "foo-");
     });
 
     test("adds the suffix to the path", () async {
-      await withTempPathAsync((path) => expect(path, endsWith(".txt")),
-          suffix: ".txt");
+      await withTempPathAsync((path) => expect(path, endsWith(".txt")), suffix: ".txt");
     });
 
     test("puts the path in Directory.systemTemp by default", () async {
-      await withTempPathAsync((path) =>
-          expect(p.isWithin(Directory.systemTemp.path, path), isTrue));
+      await withTempPathAsync((path) => expect(p.isWithin(Directory.systemTemp.path, path), isTrue));
     });
 
     test("puts the path in parent", () async {
-      await withTempPathAsync(
-          (path) => expect(p.isWithin(d.sandbox, path), isTrue),
-          parent: d.sandbox);
+      await withTempPathAsync((path) => expect(p.isWithin(d.sandbox, path), isTrue), parent: d.sandbox);
     });
 
     test("returns the callback's return value", () {
-      expect(
-          withTempPathAsync((_) => Future.value(123)), completion(equals(123)));
+      expect(withTempPathAsync((_) => Future.value(123)), completion(equals(123)));
     });
 
     group("deletes the path afterwards", () {
@@ -206,8 +190,7 @@ void main() {
 
         callbackFinishedCompleter.complete();
         await future;
-        expect(FileSystemEntity.typeSync(path),
-            equals(FileSystemEntityType.notFound));
+        expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
       });
 
       test("if the callback throws", () async {
@@ -225,8 +208,7 @@ void main() {
 
         callbackFinishedCompleter.completeError("oh no");
         await expectLater(future, throwsA("oh no"));
-        expect(FileSystemEntity.typeSync(path),
-            equals(FileSystemEntityType.notFound));
+        expect(FileSystemEntity.typeSync(path), equals(FileSystemEntityType.notFound));
       });
     });
   });
@@ -255,8 +237,7 @@ void main() {
     });
 
     test("adds the prefix to the directory", () {
-      withTempDir((dir) => expect(p.basename(dir), startsWith("foo-")),
-          prefix: "foo-");
+      withTempDir((dir) => expect(p.basename(dir), startsWith("foo-")), prefix: "foo-");
     });
 
     test("adds the suffix to the directory", () {
@@ -264,13 +245,11 @@ void main() {
     });
 
     test("puts the directory in Directory.systemTemp by default", () {
-      withTempDir(
-          (dir) => expect(p.isWithin(Directory.systemTemp.path, dir), isTrue));
+      withTempDir((dir) => expect(p.isWithin(Directory.systemTemp.path, dir), isTrue));
     });
 
     test("puts the directory in parent", () {
-      withTempDir((dir) => expect(p.isWithin(d.sandbox, dir), isTrue),
-          parent: d.sandbox);
+      withTempDir((dir) => expect(p.isWithin(d.sandbox, dir), isTrue), parent: d.sandbox);
     });
 
     group("returns the callback's return value", () {
@@ -368,30 +347,23 @@ void main() {
     });
 
     test("adds the prefix to the directory", () async {
-      await withTempDirAsync(
-          (dir) => expect(p.basename(dir), startsWith("foo-")),
-          prefix: "foo-");
+      await withTempDirAsync((dir) => expect(p.basename(dir), startsWith("foo-")), prefix: "foo-");
     });
 
     test("adds the suffix to the directory", () async {
-      await withTempDirAsync((dir) => expect(dir, endsWith(".txt")),
-          suffix: ".txt");
+      await withTempDirAsync((dir) => expect(dir, endsWith(".txt")), suffix: ".txt");
     });
 
     test("puts the directory in Directory.systemTemp by default", () async {
-      await withTempDirAsync(
-          (dir) => expect(p.isWithin(Directory.systemTemp.path, dir), isTrue));
+      await withTempDirAsync((dir) => expect(p.isWithin(Directory.systemTemp.path, dir), isTrue));
     });
 
     test("puts the directory in parent", () async {
-      await withTempDirAsync(
-          (dir) => expect(p.isWithin(d.sandbox, dir), isTrue),
-          parent: d.sandbox);
+      await withTempDirAsync((dir) => expect(p.isWithin(d.sandbox, dir), isTrue), parent: d.sandbox);
     });
 
     test("returns the callback's return value", () {
-      expect(
-          withTempDirAsync((_) => Future.value(123)), completion(equals(123)));
+      expect(withTempDirAsync((_) => Future.value(123)), completion(equals(123)));
     });
 
     group("deletes the directory afterwards", () {

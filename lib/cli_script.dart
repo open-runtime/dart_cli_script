@@ -65,10 +65,7 @@ export 'src/temp.dart';
 /// printed directly to stderr. As the name suggests, this is intended for use
 /// only when debugging.
 void wrapMain(FutureOr<void> callback(),
-    {bool chainStackTraces = true,
-    bool? printScriptException,
-    bool verboseTrace = false,
-    bool debug = false}) {
+    {bool chainStackTraces = true, bool? printScriptException, bool verboseTrace = false, bool debug = false}) {
   withConfig(() {
     Chain.capture(callback, onError: (error, chain) {
       if (error is! ScriptException) {
@@ -258,17 +255,11 @@ StreamTransformer<String, String> grep(String regexp,
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
 /// [new RegExp].
 StreamTransformer<String, String> replace(String regexp, String replacement,
-        {bool all = false,
-        bool caseSensitive = true,
-        bool unicode = false,
-        bool dotAll = false}) =>
+        {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
     NamedStreamTransformer.fromBind(
         "replace",
         (stream) => stream.replace(regexp, replacement,
-            all: all,
-            caseSensitive: caseSensitive,
-            unicode: unicode,
-            dotAll: dotAll));
+            all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll));
 
 /// Returns a transformer that replaces matches of [regexp] with the result of
 /// calling [replace].
@@ -278,26 +269,18 @@ StreamTransformer<String, String> replace(String regexp, String replacement,
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
 /// [new RegExp].
-StreamTransformer<String, String> replaceMapped(
-        String regexp, String replace(Match match),
-        {bool all = false,
-        bool caseSensitive = true,
-        bool unicode = false,
-        bool dotAll = false}) =>
+StreamTransformer<String, String> replaceMapped(String regexp, String replace(Match match),
+        {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
     NamedStreamTransformer.fromBind(
         "replaceMapped",
         (stream) => stream.replaceMapped(regexp, replace,
-            all: all,
-            caseSensitive: caseSensitive,
-            unicode: unicode,
-            dotAll: dotAll));
+            all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll));
 
 /// A transformer that emits each string exactly as it was received, but also
 /// prints each string to [currentStderr].
 ///
 /// This is primarily intended for debugging.
-final teeToStderr = NamedStreamTransformer<String, String>.fromBind(
-    "teeToStderr", (stream) => stream.teeToStderr);
+final teeToStderr = NamedStreamTransformer<String, String>.fromBind("teeToStderr", (stream) => stream.teeToStderr);
 
 /// A shorthand for opening the file at [path] as a stream.
 ///
@@ -416,8 +399,7 @@ Script xargs(FutureOr<void> callback(List<String> args),
 
   late Script script;
   return Script.capture((stdin) async {
-    script = stdin.lines
-        .xargs(callback, maxArgs: maxArgs, name: name, onSignal: onSignal);
+    script = stdin.lines.xargs(callback, maxArgs: maxArgs, name: name, onSignal: onSignal);
     await script.done;
   }, onSignal: (signal) => script.kill(signal));
 }
@@ -429,6 +411,5 @@ Script xargs(FutureOr<void> callback(List<String> args),
 /// If [root] is passed, it's used as the root directory for relative globs.
 Stream<String> ls(String glob, {String? root}) {
   var absolute = p.isAbsolute(glob);
-  return Glob(glob).list(root: root).map(
-      (entity) => absolute ? entity.path : p.relative(entity.path, from: root));
+  return Glob(glob).list(root: root).map((entity) => absolute ? entity.path : p.relative(entity.path, from: root));
 }

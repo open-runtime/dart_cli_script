@@ -44,14 +44,12 @@ class StdioGroup {
 
   static Tuple2<StdioGroup, StdioGroup> entangled() {
     var controllers = createEntangledControllers<List<int>>();
-    return Tuple2(
-        StdioGroup._(controllers.item1), StdioGroup._(controllers.item2));
+    return Tuple2(StdioGroup._(controllers.item1), StdioGroup._(controllers.item2));
   }
 
   StdioGroup() : this._(StreamController(sync: true));
 
-  StdioGroup._(this._sinkController)
-      : sink = _StdioGroupSink(_sinkController.sink) {
+  StdioGroup._(this._sinkController) : sink = _StdioGroupSink(_sinkController.sink) {
     _group.add(_sinkController.stream);
   }
 
@@ -84,8 +82,7 @@ class _StdioGroupSink extends IOSinkBase implements IOSink {
 
   void onAdd(List<int> data) => _sink.add(data);
 
-  void onError(Object error, [StackTrace? stackTrace]) =>
-      _sink.addError(error, stackTrace);
+  void onError(Object error, [StackTrace? stackTrace]) => _sink.addError(error, stackTrace);
 
   void onClose() {}
 

@@ -41,8 +41,7 @@ final _defaultEnvironment = _newMap()..addAll(Platform.environment);
 /// remove the corresponding keys from the parent [env]. If
 /// [includeParentEnvironment] is `false`, [environment] is used as the *entire*
 /// child environment instead.
-T withEnv<T>(T callback(), Map<String, String?> environment,
-    {bool includeParentEnvironment = true}) {
+T withEnv<T>(T callback(), Map<String, String?> environment, {bool includeParentEnvironment = true}) {
   var newEnvironment = _newMap();
   if (includeParentEnvironment) newEnvironment.addAll(env);
 
@@ -59,6 +58,5 @@ T withEnv<T>(T callback(), Map<String, String?> environment,
 }
 
 /// Create a new map, case-insensitively on Windows.
-Map<String, String> _newMap() => Platform.isWindows
-    ? CanonicalizedMap<String, String, String>((key) => key.toUpperCase())
-    : {};
+Map<String, String> _newMap() =>
+    Platform.isWindows ? CanonicalizedMap<String, String, String>((key) => key.toUpperCase()) : {};
