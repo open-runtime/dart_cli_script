@@ -10,7 +10,7 @@ import 'util.dart';
 void main() {
   group('on Script', () {
     test('interrupts with default signal', () async {
-      var script = mainScript('while (true) {}');
+      final script = mainScript('while (true) {}');
       await pumpEventQueue();
 
       expect(script.kill(), true);
@@ -18,14 +18,14 @@ void main() {
     });
 
     test('interrupts before process starts', () async {
-      var script = mainScript('throw Exception("oh no!");');
+      final script = mainScript('throw Exception("oh no!");');
 
       expect(script.kill(), true);
       expect(script.done, throwsScriptException(-15));
     });
 
     test('interrupts with custom signal', () async {
-      var script = mainScript('while (true) {}');
+      final script = mainScript('while (true) {}');
       await pumpEventQueue();
 
       expect(script.kill(ProcessSignal.sigint), true);
@@ -33,25 +33,25 @@ void main() {
     });
 
     test('can interrupt after Future.timeout', () async {
-      var script = mainScript('while (true) {}');
+      final script = mainScript('while (true) {}');
       await pumpEventQueue();
 
-      script.done.timeout(Duration(milliseconds: 1), onTimeout: script.kill);
+      script.done.timeout(const Duration(milliseconds: 1), onTimeout: script.kill);
 
       expect(script.done, throwsScriptException(-15));
     });
 
     test("can't be interrupt after it already exited", () async {
-      var script = mainScript('print("done!");');
+      final script = mainScript('print("done!");');
 
       expect(await script.output, 'done!');
       expect(script.kill(), false);
     });
 
     test('can be trapped without interrupting', () async {
-      var completer = Completer<void>();
-      var script = _watchSignalsAndExit(completer);
-      var output = script.output;
+      final completer = Completer<void>();
+      final script = _watchSignalsAndExit(completer);
+      final output = script.output;
 
       expect(script.kill(), true);
 
@@ -63,12 +63,12 @@ void main() {
 
   group('on Script.capture', () {
     test('does not interrupt by default', () async {
-      var completer = Completer<void>();
-      var script = Script.capture((_) async {
+      final completer = Completer<void>();
+      final script = Script.capture((_) async {
         await completer.future;
         print('done!');
       });
-      var output = script.output;
+      final output = script.output;
 
       expect(script.kill(), false);
 
@@ -78,9 +78,9 @@ void main() {
     });
 
     test('can capture Script.kill signals', () async {
-      var completer = Completer<void>();
-      var script = _watchSignalsAndExit(completer);
-      var output = script.output;
+      final completer = Completer<void>();
+      final script = _watchSignalsAndExit(completer);
+      final output = script.output;
 
       expect(script.kill(), true);
 
@@ -90,13 +90,13 @@ void main() {
     });
 
     test('prints from signal handler', () async {
-      var completer = Completer<void>();
-      var script = Script.capture((_) async => await completer.future, onSignal: (signal) {
+      final completer = Completer<void>();
+      final script = Script.capture((_) async => completer.future, onSignal: (signal) {
         print('stdout: $signal');
         currentStderr.writeln('stderr: $signal');
         return true;
       });
-      var lines = script.combineOutput().lines;
+      final lines = script.combineOutput().lines;
 
       expect(script.kill(), true);
 
@@ -106,9 +106,9 @@ void main() {
     });
 
     test('does not call signal handler after script exited', () async {
-      var completer = Completer<void>();
+      final completer = Completer<void>();
       var killCalls = 0;
-      var script = Script.capture((_) async => await completer.future, onSignal: (signal) {
+      final script = Script.capture((_) async => completer.future, onSignal: (signal) {
         killCalls++;
         return true;
       });
@@ -123,8 +123,8 @@ void main() {
     });
 
     test('catches script error from signal handler', () async {
-      var completer = Completer<void>();
-      var script = Script.capture((_) async => await completer.future,
+      final completer = Completer<void>();
+      final script = Script.capture((_) async => completer.future,
           onSignal: (signal) => throw ScriptException('onSignal', 42));
 
       expect(script.kill(), false);
@@ -135,8 +135,8 @@ void main() {
     });
 
     test('catches exception from signal handler', () async {
-      var completer = Completer<void>();
-      var script = Script.capture((_) async => await completer.future, onSignal: (signal) => throw Exception('oh no!'));
+      final completer = Completer<void>();
+      final script = Script.capture((_) async => completer.future, onSignal: (signal) => throw Exception('oh no!'));
 
       expect(script.kill(), false);
 
@@ -147,9 +147,9 @@ void main() {
   });
 
   test('BufferedScript.capture can capture Script.kill signals', () async {
-    var completer = Completer<void>();
-    var signalStream = StreamController<ProcessSignal>();
-    var script = BufferedScript.capture((_) async {
+    final completer = Completer<void>();
+    final signalStream = StreamController<ProcessSignal>();
+    final script = BufferedScript.capture((_) async {
       signalStream.stream.listen(print);
       await completer.future;
       await signalStream.close();
@@ -160,7 +160,7 @@ void main() {
     });
 
     var done = false;
-    var output = script.output.then((v) {
+    final output = script.output.then((v) {
       done = true;
       return v;
     });
@@ -176,11 +176,11 @@ void main() {
   });
 
   test('interrupts a Script.fromLineTransformer', () async {
-    var script = Script.fromLineTransformer(StreamTransformer.fromHandlers(
+    final script = Script.fromLineTransformer(StreamTransformer.fromHandlers(
       handleData: (data, sink) => sink.add(data.toUpperCase()),
     ));
 
-    var events = <String>[];
+    final events = <String>[];
     var done = false;
     script.stdout.lines.listen(events.add, onDone: () => done = true);
 
@@ -199,10 +199,10 @@ void main() {
 
   group('on a ByteStream pipe', () {
     test('interrupts pipe', () async {
-      var controller = StreamController<List<int>>();
-      var completer = Completer<void>();
-      var script = controller.stream | _watchSignalsAndStdin(completer);
-      var lines = script.stdout.lines;
+      final controller = StreamController<List<int>>();
+      final completer = Completer<void>();
+      final script = controller.stream | _watchSignalsAndStdin(completer);
+      final lines = script.stdout.lines;
 
       controller.sink.add(utf8.encode('before'));
       await pumpEventQueue();
@@ -228,12 +228,12 @@ void main() {
     });
 
     test('cancels underlying stream', () async {
-      var controller = StreamController<String>();
-      var completer = Completer<void>();
-      var script = controller.stream | Script.capture((_) async => await completer.future);
+      final controller = StreamController<String>();
+      final completer = Completer<void>();
+      final script = controller.stream | Script.capture((_) async => completer.future);
       var canceled = false;
       controller.onCancel = () => canceled = true;
-      var done = script.done;
+      final done = script.done;
 
       expect(script.kill(), true);
       await pumpEventQueue();
@@ -246,9 +246,9 @@ void main() {
 
   group('on LineStream.xargs', () {
     test('interrupts without maxArgs', () async {
-      var controller = StreamController<String>();
-      var script = controller.stream.xargs(print);
-      var lines = script.stdout.text;
+      final controller = StreamController<String>();
+      final script = controller.stream.xargs(print);
+      final lines = script.stdout.text;
 
       controller.sink.add('before');
       await pumpEventQueue();
@@ -264,9 +264,9 @@ void main() {
     });
 
     test('interrupts with maxArgs', () async {
-      var controller = StreamController<String>();
-      var script = controller.stream.xargs(print, maxArgs: 2);
-      var lines = script.stdout.text;
+      final controller = StreamController<String>();
+      final script = controller.stream.xargs(print, maxArgs: 2);
+      final lines = script.stdout.text;
 
       controller.sink.add('a');
       controller.sink.add('b');
@@ -284,9 +284,9 @@ void main() {
     });
 
     test('can capture Script.kill signals', () async {
-      var signalCompleter = Completer<ProcessSignal>();
-      var controller = StreamController<String>();
-      var script = controller.stream.xargs(print, onSignal: signalCompleter.complete);
+      final signalCompleter = Completer<ProcessSignal>();
+      final controller = StreamController<String>();
+      final script = controller.stream.xargs(print, onSignal: signalCompleter.complete);
 
       expect(script.kill(), true);
       expect(await signalCompleter.future, ProcessSignal.sigterm);
@@ -294,8 +294,8 @@ void main() {
     });
 
     test('cancels underlying stream', () async {
-      var controller = StreamController<String>();
-      var script = controller.stream.xargs(print);
+      final controller = StreamController<String>();
+      final script = controller.stream.xargs(print);
       var canceled = false;
       controller.onCancel = () => canceled = true;
 
@@ -307,14 +307,14 @@ void main() {
 
   group('on xargs from stdin', () {
     test('interrupts without maxArgs', () async {
-      var completer = Completer<void>();
-      var script = Script.capture((_) async {
+      final completer = Completer<void>();
+      final script = Script.capture((_) async {
             print('before');
             await completer.future;
             print('after');
           }) |
           xargs(print, maxArgs: 2);
-      var lines = script.stdout.text;
+      final lines = script.stdout.text;
 
       expect(script.kill(), true);
       expect(script.done, throwsScriptException(143));
@@ -327,14 +327,14 @@ void main() {
     });
 
     test('interrupts with maxArgs', () async {
-      var completer = Completer<void>();
-      var script = Script.capture((_) async {
+      final completer = Completer<void>();
+      final script = Script.capture((_) async {
             print('a\nb\nc');
             await completer.future;
             print('d');
           }) |
           xargs(print, maxArgs: 2);
-      var lines = script.stdout.text;
+      final lines = script.stdout.text;
       await pumpEventQueue();
 
       expect(script.kill(), true);
@@ -348,9 +348,9 @@ void main() {
     });
 
     test('can capture Script.kill signals', () async {
-      var signalCompleter = Completer<ProcessSignal>();
-      var script =
-          Script.capture((_) async => await signalCompleter.future) | xargs(print, onSignal: signalCompleter.complete);
+      final signalCompleter = Completer<ProcessSignal>();
+      final script =
+          Script.capture((_) async => signalCompleter.future) | xargs(print, onSignal: signalCompleter.complete);
 
       expect(script.kill(), true);
       expect(await signalCompleter.future, ProcessSignal.sigterm);
@@ -359,9 +359,9 @@ void main() {
   });
 
   test('on silenceUntilFailure can capture Script.kill signals', () async {
-    var signalStream = StreamController<ProcessSignal>();
-    var completer = Completer<void>();
-    var script = silenceUntilFailure((_) async {
+    final signalStream = StreamController<ProcessSignal>();
+    final completer = Completer<void>();
+    final script = silenceUntilFailure((_) async {
       signalStream.stream.listen(print);
       await completer.future;
       await signalStream.close();
@@ -370,8 +370,8 @@ void main() {
       signalStream.sink.add(signal);
       return true;
     });
-    var stderr = script.stderr.text;
-    var stdout = script.stdout.text;
+    final stderr = script.stderr.text;
+    final stdout = script.stdout.text;
 
     expect(script.kill(), true);
     expect(script.done, throwsScriptException(1));
@@ -383,11 +383,11 @@ void main() {
     expect(script.kill(), false);
   });
 
-  test("sends signal to script currently running in a pipe chain", () async {
-    var completer1 = Completer<void>();
-    var completer2 = Completer<void>();
-    var pipeline = _watchSignalsAndExit(completer1) | _watchSignalsAndStdin(completer2);
-    var lines = pipeline.lines;
+  test('sends signal to script currently running in a pipe chain', () async {
+    final completer1 = Completer<void>();
+    final completer2 = Completer<void>();
+    final pipeline = _watchSignalsAndExit(completer1) | _watchSignalsAndStdin(completer2);
+    final lines = pipeline.lines;
 
     expect(pipeline.kill(), true);
     await pumpEventQueue();
@@ -412,7 +412,7 @@ void main() {
 }
 
 Script _watchSignalsAndExit(Completer<void> completer) {
-  var signalStream = StreamController<ProcessSignal>();
+  final signalStream = StreamController<ProcessSignal>();
   return Script.capture((_) async {
     signalStream.stream.listen(print);
     await completer.future;
@@ -425,12 +425,12 @@ Script _watchSignalsAndExit(Completer<void> completer) {
 }
 
 Script _watchSignalsAndStdin(Completer<void> completer) {
-  var signalStream = StreamController<ProcessSignal>();
+  final signalStream = StreamController<ProcessSignal>();
   return Script.capture((stdin) async {
     signalStream.stream.listen((event) {
       print('b: $event');
     });
-    await for (var line in stdin.lines) {
+    await for (final line in stdin.lines) {
       print('from a: $line');
     }
     await completer.future;

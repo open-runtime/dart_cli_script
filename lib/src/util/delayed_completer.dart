@@ -21,6 +21,11 @@ import 'package:meta/meta.dart';
 /// [ready] is called.
 @sealed
 class DelayedCompleter<T> implements Completer<T> {
+
+  DelayedCompleter() : _inner = Completer<T>();
+
+  /// Like [Completer.sync].
+  DelayedCompleter.sync() : _inner = Completer<T>.sync();
   /// Whether [ready] has been called.
   bool get isReady => _ready;
   var _ready = false;
@@ -34,19 +39,17 @@ class DelayedCompleter<T> implements Completer<T> {
   /// The inner completer that actually dispatches the event.
   final Completer<T> _inner;
 
+  @override
   bool get isCompleted => _completed;
   var _completed = false;
 
+  @override
   Future<T> get future => _inner.future;
 
-  DelayedCompleter() : _inner = Completer<T>();
-
-  /// Like [Completer.sync].
-  DelayedCompleter.sync() : _inner = Completer<T>.sync();
-
+  @override
   void complete([FutureOr<T>? value]) {
     if (_completed) {
-      throw StateError("DelayedCompleter has already been completed.");
+      throw StateError('DelayedCompleter has already been completed.');
     }
     _completed = true;
 
@@ -59,9 +62,10 @@ class DelayedCompleter<T> implements Completer<T> {
     }
   }
 
+  @override
   void completeError(Object error, [StackTrace? stackTrace]) {
     if (_completed) {
-      throw StateError("DelayedCompleter has already been completed.");
+      throw StateError('DelayedCompleter has already been completed.');
     }
     _completed = true;
 
@@ -84,7 +88,7 @@ class DelayedCompleter<T> implements Completer<T> {
   void ready() {
     if (_ready) return;
 
-    var result = _result;
+    final result = _result;
     _result = null;
     _ready = true;
 

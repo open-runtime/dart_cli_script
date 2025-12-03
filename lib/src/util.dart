@@ -19,7 +19,7 @@ import 'package:string_scanner/string_scanner.dart';
 
 /// Runs [onFinally] after [callback] completes, whether it returns a [Future]
 /// or a synchronous value.
-T tryFinally<T>(T callback(), void onFinally()) {
+T tryFinally<T>(T Function() callback, void Function() onFinally) {
   late T result;
   try {
     result = callback();
@@ -36,8 +36,8 @@ T tryFinally<T>(T callback(), void onFinally()) {
 /// Replaces [match] with a [replacement] string in the style of
 /// [LineStreamExtensions.replace].
 String replaceMatch(Match match, String replacement) {
-  var scanner = SpanScanner(replacement);
-  var buffer = StringBuffer();
+  final scanner = SpanScanner(replacement);
+  final buffer = StringBuffer();
 
   while (!scanner.isDone) {
     var next = scanner.readChar();
@@ -50,12 +50,12 @@ String replaceMatch(Match match, String replacement) {
 
     next = scanner.readChar();
     if (next >= $0 && next <= $9) {
-      var groupNumber = next - $0;
+      final groupNumber = next - $0;
       if (groupNumber > match.groupCount) {
         scanner.error("RegExp doesn't have group $groupNumber.", position: scanner.position - 2, length: 2);
       }
 
-      var group = match[groupNumber];
+      final group = match[groupNumber];
       if (group != null) buffer.write(group);
     } else {
       buffer.writeCharCode(next);
@@ -70,7 +70,7 @@ String replaceMatch(Match match, String replacement) {
 extension UtilStreamExtensions<T> on Stream<T> {
   /// Returns a transformation of [this] that calls [callback] immediately
   /// before sending a `done` event to its listeners.
-  Stream<T> onDone(void callback()) => transform(StreamTransformer.fromHandlers(handleDone: (sink) {
+  Stream<T> onDone(void Function() callback) => transform(StreamTransformer.fromHandlers(handleDone: (sink) {
         callback();
         sink.close();
       }));

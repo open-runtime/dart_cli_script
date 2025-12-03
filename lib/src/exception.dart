@@ -14,17 +14,18 @@
 
 /// An exception indicating that a [Script] failed.
 class ScriptException implements Exception {
+
+  ScriptException(this.scriptName, this.exitCode) {
+    if (exitCode == 0) {
+      throw RangeError.value(exitCode, 'exitCode', 'May not be 0');
+    }
+  }
   /// The human-readable name of the script that failed.
   final String scriptName;
 
   /// The exit code produced by the failing script.
   final int exitCode;
 
-  ScriptException(this.scriptName, this.exitCode) {
-    if (exitCode == 0) {
-      throw RangeError.value(exitCode, "exitCode", "May not be 0");
-    }
-  }
-
-  String toString() => "$scriptName failed with exit code $exitCode.";
+  @override
+  String toString() => '$scriptName failed with exit code $exitCode.';
 }

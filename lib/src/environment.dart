@@ -25,7 +25,7 @@ import 'package:collection/collection.dart';
 /// On Windows, environment keys are canonicalized to upper-case, since
 /// environment variables are case-insensitive.
 Map<String, String> get env {
-  var environment = Zone.current[#_environment];
+  final environment = Zone.current[#_environment];
   return environment is Map<String, String> ? environment : _defaultEnvironment;
 }
 
@@ -41,12 +41,12 @@ final _defaultEnvironment = _newMap()..addAll(Platform.environment);
 /// remove the corresponding keys from the parent [env]. If
 /// [includeParentEnvironment] is `false`, [environment] is used as the *entire*
 /// child environment instead.
-T withEnv<T>(T callback(), Map<String, String?> environment, {bool includeParentEnvironment = true}) {
-  var newEnvironment = _newMap();
+T withEnv<T>(T Function() callback, Map<String, String?> environment, {bool includeParentEnvironment = true}) {
+  final newEnvironment = _newMap();
   if (includeParentEnvironment) newEnvironment.addAll(env);
 
-  for (var entry in environment.entries) {
-    var value = entry.value;
+  for (final entry in environment.entries) {
+    final value = entry.value;
     if (value == null) {
       newEnvironment.remove(entry.key);
     } else {

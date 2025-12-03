@@ -37,7 +37,7 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   /// `true` at the same time as [exclude].
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-  /// [new RegExp].
+  /// [RegExp.new].
   Stream<Tuple2<String, SourceSpanWithContext>> grep(String regexp,
       {bool exclude = false,
       bool onlyMatching = false,
@@ -48,7 +48,7 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
       throw ArgumentError("The exclude and onlyMatching flags can't both be set");
     }
 
-    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    final pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
     return onlyMatching
         ? expand((tuple) => pattern
@@ -68,7 +68,7 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   /// followed by a number return the character immediately following them.
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-  /// [new RegExp].
+  /// [RegExp.new].
   Stream<Tuple2<String, SourceSpanWithContext>> replace(String regexp, String replacement,
           {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
       replaceMapped(regexp, (match) => replaceMatch(match, replacement),
@@ -80,10 +80,10 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   /// replaces all matches in each line instead.
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-  /// [new RegExp].
-  Stream<Tuple2<String, SourceSpanWithContext>> replaceMapped(String regexp, String replace(Match match),
+  /// [RegExp.new].
+  Stream<Tuple2<String, SourceSpanWithContext>> replaceMapped(String regexp, String Function(Match match) replace,
       {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) {
-    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    final pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
     return mapLines(
         (line) => all ? line.replaceAllMapped(pattern, replace) : line.replaceFirstMapped(pattern, replace));
   }

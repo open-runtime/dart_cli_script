@@ -17,18 +17,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:cli_script/cli_script.dart';
 import 'package:path/path.dart' as p;
 import 'package:source_span/source_span.dart';
 import 'package:tuple/tuple.dart';
 
+import '../../cli_script.dart';
 import '../util.dart';
 
 /// Extensions on [Stream<String>] that treat it as a stream of discrete lines
 /// (as commonly emitted by a shell script).
 extension LineStreamExtensions on Stream<String> {
   /// Converts this to a byte stream with newlines baked in.
-  Stream<List<int>> get bytes => map<List<int>>((line) => utf8.encode("$line\n"));
+  Stream<List<int>> get bytes => map<List<int>>((line) => utf8.encode('$line\n'));
 
   /// Pipes [this] into [script]'s [stdin] with newlines baked in.
   ///
@@ -54,7 +54,7 @@ extension LineStreamExtensions on Stream<String> {
   Stream<Tuple2<String, SourceSpanWithContext>> withSpans({Uri? sourceUrl, String? sourcePath}) {
     if (sourcePath != null) {
       if (sourceUrl != null) {
-        throw ArgumentError("Only one of url and path may be passed.");
+        throw ArgumentError('Only one of url and path may be passed.');
       }
       sourceUrl = p.toUri(sourcePath);
     }
@@ -62,7 +62,7 @@ extension LineStreamExtensions on Stream<String> {
     var lineNumber = 0;
     var offset = 0;
     return map((line) {
-      var span = SourceSpanWithContext(
+      final span = SourceSpanWithContext(
           SourceLocation(offset, sourceUrl: sourceUrl, line: lineNumber, column: 0),
           SourceLocation(offset + line.length, sourceUrl: sourceUrl, line: lineNumber, column: line.length),
           line,
@@ -83,7 +83,7 @@ extension LineStreamExtensions on Stream<String> {
   /// `true` at the same time as [exclude].
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-  /// [new RegExp].
+  /// [RegExp.new].
   Stream<String> grep(String regexp,
       {bool exclude = false,
       bool onlyMatching = false,
@@ -94,7 +94,7 @@ extension LineStreamExtensions on Stream<String> {
       throw ArgumentError("The exclude and onlyMatching flags can't both be set");
     }
 
-    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    final pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
     return onlyMatching
         ? expand((line) => pattern.allMatches(line).map((match) => match.group(0)!).where((match) => match.isNotEmpty))
@@ -111,7 +111,7 @@ extension LineStreamExtensions on Stream<String> {
   /// followed by a number return the character immediately following them.
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-  /// [new RegExp].
+  /// [RegExp.new].
   Stream<String> replace(String regexp, String replacement,
           {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
       replaceMapped(regexp, (match) => replaceMatch(match, replacement),
@@ -123,10 +123,10 @@ extension LineStreamExtensions on Stream<String> {
   /// replaces all matches in each line instead.
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-  /// [new RegExp].
-  Stream<String> replaceMapped(String regexp, String replace(Match match),
+  /// [RegExp.new].
+  Stream<String> replaceMapped(String regexp, String Function(Match match) replace,
       {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) {
-    var pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+    final pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
     return map((line) => all ? line.replaceAllMapped(pattern, replace) : line.replaceFirstMapped(pattern, replace));
   }
 
@@ -170,19 +170,19 @@ extension LineStreamExtensions on Stream<String> {
   ///
   /// See also `xargs` in `package:cli_script/cli_script.dart`, which takes
   /// arguments from [stdin] rather than from this string stream.
-  Script xargs(FutureOr<void> callback(List<String> args),
-      {int? maxArgs, String? name, void onSignal(ProcessSignal signal)?}) {
+  Script xargs(FutureOr<void> Function(List<String> args) callback,
+      {int? maxArgs, String? name, void Function(ProcessSignal signal)? onSignal}) {
     if (maxArgs != null && maxArgs < 1) {
       throw RangeError.range(maxArgs, 1, null, 'maxArgs');
     }
 
-    var signalCloser = StreamCloser<String>();
-    var self = transform(signalCloser);
-    var chunks = maxArgs != null ? self.slices(maxArgs) : self.toList().asStream();
+    final signalCloser = StreamCloser<String>();
+    final self = transform(signalCloser);
+    final chunks = maxArgs != null ? self.slices(maxArgs) : self.toList().asStream();
 
     return Script.capture(
         (_) async {
-          await for (var chunk in chunks) {
+          await for (final chunk in chunks) {
             if (signalCloser.isClosed) break;
             await callback(chunk);
           }

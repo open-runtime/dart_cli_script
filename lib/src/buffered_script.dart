@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
@@ -40,8 +40,52 @@ import 'util/entangled_controllers.dart';
 /// running, or only if they fail.
 @sealed
 class BufferedScript extends Script {
+
+  /// Like [Script.capture], but all output is silently buffered until [release]
+  /// is called.
+  ///
+  /// If [stderrOnly] is passed, this will only buffer the [stderr] stream. The
+  /// [stdout] stream will be emitted immediately as for a normal [Script].
+  ///
+  /// The [callback] can't be interrupted by calling [kill], but the [onSignal]
+  /// callback allows capturing those signals so the callback may react
+  /// appropriately. When no [onSignal] handler was set, calling [kill] will do
+  /// nothing and return `false`.
+  factory BufferedScript.capture(FutureOr<void> Function(Stream<List<int>> stdin) callback,
+      {String? name, bool Function(ProcessSignal signal)? onSignal, bool stderrOnly = false}) {
+    final inner = Script.capture(callback, name: name ?? 'BufferedScript.capture', onSignal: onSignal);
+
+    if (stderrOnly) {
+      return BufferedScript._(inner, null, StreamController<List<int>>());
+    } else {
+      final controllers = createEntangledControllers<List<int>>();
+      return BufferedScript._(inner, controllers.item1, controllers.item2);
+    }
+  }
+
+  /// A helper constructor that allows [BufferedScript.capture] to pass in both
+  /// [_stdoutBuffer] and [_stderrBuffer] from a single call to
+  /// [createEntangledControllers].
+  BufferedScript._(Script script, this._stdoutBuffer, this._stderrBuffer)
+      : _stdoutCompleter = _stdoutBuffer == null ? null : StreamCompleter<List<int>>(),
+        super.fromComponentsInternal(
+            script.name,
+            () => ScriptComponents(
+                script.stdin, _stdoutBuffer == null ? script.stdout : const Stream.empty(), const Stream.empty(), script.exitCode),
+            script.kill,
+            silenceStartMessage: true) {
+    final stdoutBuffer = _stdoutBuffer;
+    if (stdoutBuffer != null) script.stdout.pipe(stdoutBuffer);
+    script.stderr.pipe(_stderrBuffer);
+
+    // Don't consider errors unhandled by default. This allows users to wait to
+    // access [done], [success], and [exitCode] until later on, for example
+    // after another parallel script has finished executing.
+    done.catchError((_) {});
+  }
+  @override
   Stream<List<int>> get stdout {
-    var stdoutCompleter = _stdoutCompleter;
+    final stdoutCompleter = _stdoutCompleter;
     if (stdoutCompleter == null) {
       return super.stdout;
     } else {
@@ -68,6 +112,7 @@ class BufferedScript extends Script {
   /// forwarded as normal.
   final StreamController<List<int>>? _stdoutBuffer;
 
+  @override
   Stream<List<int>> get stderr {
     // Even though we use our own stderr stream, access this so that the
     // superclass knows not to forward it to the parent context.
@@ -85,49 +130,6 @@ class BufferedScript extends Script {
   /// will emit done events rather than replaying their buffers.
   final StreamController<List<int>> _stderrBuffer;
 
-  /// Like [Script.capture], but all output is silently buffered until [release]
-  /// is called.
-  ///
-  /// If [stderrOnly] is passed, this will only buffer the [stderr] stream. The
-  /// [stdout] stream will be emitted immediately as for a normal [Script].
-  ///
-  /// The [callback] can't be interrupted by calling [kill], but the [onSignal]
-  /// callback allows capturing those signals so the callback may react
-  /// appropriately. When no [onSignal] handler was set, calling [kill] will do
-  /// nothing and return `false`.
-  factory BufferedScript.capture(FutureOr<void> Function(Stream<List<int>> stdin) callback,
-      {String? name, bool onSignal(ProcessSignal signal)?, bool stderrOnly = false}) {
-    var inner = Script.capture(callback, name: name ?? "BufferedScript.capture", onSignal: onSignal);
-
-    if (stderrOnly) {
-      return BufferedScript._(inner, null, StreamController<List<int>>());
-    } else {
-      var controllers = createEntangledControllers<List<int>>();
-      return BufferedScript._(inner, controllers.item1, controllers.item2);
-    }
-  }
-
-  /// A helper constructor that allows [BufferedScript.capture] to pass in both
-  /// [_stdoutBuffer] and [_stderrBuffer] from a single call to
-  /// [createEntangledControllers].
-  BufferedScript._(Script script, this._stdoutBuffer, this._stderrBuffer)
-      : _stdoutCompleter = _stdoutBuffer == null ? null : StreamCompleter<List<int>>(),
-        super.fromComponentsInternal(
-            script.name,
-            () => ScriptComponents(
-                script.stdin, _stdoutBuffer == null ? script.stdout : Stream.empty(), Stream.empty(), script.exitCode),
-            script.kill,
-            silenceStartMessage: true) {
-    var stdoutBuffer = _stdoutBuffer;
-    if (stdoutBuffer != null) script.stdout.pipe(stdoutBuffer);
-    script.stderr.pipe(_stderrBuffer);
-
-    // Don't consider errors unhandled by default. This allows users to wait to
-    // access [done], [success], and [exitCode] until later on, for example
-    // after another parallel script has finished executing.
-    done.catchError((_) {});
-  }
-
   /// Emits all buffered output to [stdout] and [stderr].
   ///
   /// Returns a future that completes once all output has been emitted. If the
@@ -138,7 +140,7 @@ class BufferedScript extends Script {
         _stdoutCompleter?.setSourceStream(_stdoutBuffer!.stream);
         _stderrCompleter.setSourceStream(_stderrBuffer.stream);
 
-        var stdoutBuffer = _stdoutBuffer;
+        final stdoutBuffer = _stdoutBuffer;
         await Future.wait([if (stdoutBuffer != null) stdoutBuffer.done, _stderrBuffer.done]);
 
         // Give outer stdio listeners a chance to handle the IO.

@@ -13,15 +13,14 @@
 // limitations under the License.
 
 import 'package:async/async.dart';
-import 'package:test/test.dart';
-
 import 'package:cli_script/src/util/delayed_completer.dart';
+import 'package:test/test.dart';
 
 void main() {
   late DelayedCompleter<String> completer;
   setUp(() => completer = DelayedCompleter());
 
-  group("when the completer is completed and then ready() is called", () {
+  group('when the completer is completed and then ready() is called', () {
     Result<String>? result;
     setUp(() {
       result = null;
@@ -32,9 +31,9 @@ void main() {
       });
     });
 
-    test("completes with a value", () async {
+    test('completes with a value', () async {
       expect(completer.isCompleted, isFalse);
-      completer.complete("foo");
+      completer.complete('foo');
       expect(completer.isCompleted, isTrue);
       await pumpEventQueue();
       expect(result, isNull);
@@ -45,12 +44,12 @@ void main() {
       expect(completer.isReady, isTrue);
       expect(completer.isReady, isTrue);
       await pumpEventQueue();
-      expect(result!.asValue!.value, equals("foo"));
+      expect(result!.asValue!.value, equals('foo'));
     });
 
-    test("completes with an error", () async {
+    test('completes with an error', () async {
       expect(completer.isCompleted, isFalse);
-      completer.completeError("oh no");
+      completer.completeError('oh no');
       expect(completer.isCompleted, isTrue);
       await pumpEventQueue();
       expect(result, isNull);
@@ -59,12 +58,12 @@ void main() {
       completer.ready();
       expect(completer.isReady, isTrue);
       await pumpEventQueue();
-      expect(result!.asError!.error, equals("oh no"));
+      expect(result!.asError!.error, equals('oh no'));
     });
 
-    test("completes with an asynchronous value", () async {
+    test('completes with an asynchronous value', () async {
       expect(completer.isCompleted, isFalse);
-      completer.complete(Future.value("foo"));
+      completer.complete(Future.value('foo'));
       expect(completer.isCompleted, isTrue);
       await pumpEventQueue();
       expect(result, isNull);
@@ -73,12 +72,12 @@ void main() {
       completer.ready();
       expect(completer.isReady, isTrue);
       await pumpEventQueue();
-      expect(result!.asValue!.value, equals("foo"));
+      expect(result!.asValue!.value, equals('foo'));
     });
 
-    test("completes with an asynchronous error", () async {
+    test('completes with an asynchronous error', () async {
       expect(completer.isCompleted, isFalse);
-      completer.complete(Future.error("oh no"));
+      completer.complete(Future.error('oh no'));
       expect(completer.isCompleted, isTrue);
       await pumpEventQueue();
       expect(result, isNull);
@@ -87,43 +86,43 @@ void main() {
       completer.ready();
       expect(completer.isReady, isTrue);
       await pumpEventQueue();
-      expect(result!.asError!.error, equals("oh no"));
+      expect(result!.asError!.error, equals('oh no'));
     });
   });
 
-  group("when ready() is called and then the completer is completed", () {
+  group('when ready() is called and then the completer is completed', () {
     setUp(() {
       expect(completer.isReady, isFalse);
       completer.ready();
       expect(completer.isReady, isTrue);
     });
 
-    test("completes with a value", () async {
+    test('completes with a value', () async {
       expect(completer.isCompleted, isFalse);
-      completer.complete("foo");
+      completer.complete('foo');
       expect(completer.isCompleted, isTrue);
-      expect(completer.future, completion(equals("foo")));
+      expect(completer.future, completion(equals('foo')));
     });
 
-    test("completes with an error", () async {
+    test('completes with an error', () async {
       expect(completer.isCompleted, isFalse);
-      completer.completeError("oh no");
+      completer.completeError('oh no');
       expect(completer.isCompleted, isTrue);
-      expect(completer.future, throwsA("oh no"));
+      expect(completer.future, throwsA('oh no'));
     });
 
-    test("completes with an asynchronous value", () async {
+    test('completes with an asynchronous value', () async {
       expect(completer.isCompleted, isFalse);
-      completer.complete(Future.value("foo"));
+      completer.complete(Future.value('foo'));
       expect(completer.isCompleted, isTrue);
-      expect(completer.future, completion(equals("foo")));
+      expect(completer.future, completion(equals('foo')));
     });
 
-    test("completes with an asynchronous error", () async {
+    test('completes with an asynchronous error', () async {
       expect(completer.isCompleted, isFalse);
-      completer.complete(Future.error("oh no"));
+      completer.complete(Future.error('oh no'));
       expect(completer.isCompleted, isTrue);
-      expect(completer.future, throwsA("oh no"));
+      expect(completer.future, throwsA('oh no'));
     });
   });
 }

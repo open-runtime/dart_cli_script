@@ -14,17 +14,16 @@
 
 import 'dart:io';
 
+import 'package:cli_script/cli_script.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
-
-import 'package:cli_script/cli_script.dart';
 
 /// The next unique number to use to use when generating a [uid].
 var _nextId = 0;
 
 /// Returns an alphanumeric-with-underscores string that will be unique within
 /// the scope of the current test file.
-String uid() => "cli_script_test_${_nextId++}";
+String uid() => 'cli_script_test_${_nextId++}';
 
 /// Runs the Dart code [code] as a subprocess [Script].
 Script dartScript(String code,
@@ -33,7 +32,7 @@ Script dartScript(String code,
     String? workingDirectory,
     Map<String, String>? environment,
     bool includeParentEnvironment = true}) {
-  var script = d.path("${uid()}.dart");
+  final script = d.path('${uid()}.dart');
   File(script).writeAsStringSync(code);
 
   return Script(arg(Platform.executable),
@@ -71,7 +70,7 @@ Script mainScript(String code,
 /// the given exit code.
 Matcher isScriptException(int exitCode) => predicate((error) {
       expect(error, isA<ScriptException>());
-      expect((error as ScriptException).exitCode, equals(exitCode));
+      expect((error! as ScriptException).exitCode, equals(exitCode));
       return true;
     });
 

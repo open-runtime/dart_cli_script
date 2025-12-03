@@ -30,10 +30,10 @@ import 'sink_base.dart';
 /// Note: these controllers are effectively synchronous, and so should only have
 /// events added to them at the end of event loops.
 Tuple2<StreamController<T>, StreamController<T>> createEntangledControllers<T>() {
-  var buffer = _EntangledBuffer<T>();
+  final buffer = _EntangledBuffer<T>();
 
-  var controller1 = _EntangledController<T>(buffer, true);
-  var controller2 = _EntangledController<T>(buffer, false);
+  final controller1 = _EntangledController<T>(buffer, true);
+  final controller2 = _EntangledController<T>(buffer, false);
 
   return Tuple2(controller1, controller2);
 }
@@ -44,6 +44,13 @@ Tuple2<StreamController<T>, StreamController<T>> createEntangledControllers<T>()
 /// Once either one is listened to, the controllers' internal buffers are used
 /// instead.
 class _EntangledBuffer<T> {
+
+  _EntangledBuffer()
+      : controller1 = StreamController(sync: true),
+        controller2 = StreamController(sync: true) {
+    controller1.onListen = _flush;
+    controller2.onListen = _flush;
+  }
   /// The events that will be emitted once either controller gets a listener, or
   /// `null` if the events have already been pushed to the controllers.
   ///
@@ -64,13 +71,6 @@ class _EntangledBuffer<T> {
   /// The [StreamSink] methods on this controller should not be accessed outside
   /// of [_EntangledBuffer].
   final StreamController<T> controller2;
-
-  _EntangledBuffer()
-      : controller1 = StreamController(sync: true),
-        controller2 = StreamController(sync: true) {
-    controller1.onListen = _flush;
-    controller2.onListen = _flush;
-  }
 
   /// Starts flushing all events from [_events] to their respective controllers.
   void _flush() {
@@ -98,18 +98,18 @@ class _EntangledBuffer<T> {
   /// buffered events are dispatched.
   void _scheduleNextEvent() {
     scheduleMicrotask(() {
-      var events = _events;
+      final events = _events;
       if (events == null) return;
 
-      var event = events.removeFirst();
+      final event = events.removeFirst();
 
       // Once we've run out of events, null out the queue to indicate to [add],
       // [addError], and [close] that they can start forwarding events directly
       // to the controllers.
       if (events.isEmpty) _events = null;
 
-      var controller = event.item1 ? controller1 : controller2;
-      var result = event.item2;
+      final controller = event.item1 ? controller1 : controller2;
+      final result = event.item2;
       if (result == null) {
         controller.close();
       } else if (result is ValueResult<T>) {
@@ -125,7 +125,7 @@ class _EntangledBuffer<T> {
   /// Adds [value] as a data event for [controller1] if [forController1] is
   /// `true`, or [controller2] otherwise.
   void add(bool forController1, T value) {
-    var events = _events;
+    final events = _events;
     if (events != null) {
       events.add(Tuple2(forController1, Result.value(value)));
     } else {
@@ -136,7 +136,7 @@ class _EntangledBuffer<T> {
   /// Adds [error] as an error event for [controller1] if [forController1] is
   /// `true`, or [controller2] otherwise.
   void addError(bool forController1, Object error, [StackTrace? stackTrace]) {
-    var events = _events;
+    final events = _events;
     if (events != null) {
       events.add(Tuple2(forController1, Result.error(error, stackTrace)));
     } else {
@@ -147,7 +147,7 @@ class _EntangledBuffer<T> {
   /// Adds a close event for [controller1] if [forController1] is `true`, or
   /// [controller2] otherwise.
   void close(bool forController1) {
-    var events = _events;
+    final events = _events;
     if (events != null) {
       events.add(Tuple2(forController1, null));
     } else {
@@ -159,6 +159,8 @@ class _EntangledBuffer<T> {
 /// A wrapper that pipes inputs to [_EntangledBuffer] and exposes output from
 /// one of [_EntangledBuffer]'s controllers.
 class _EntangledController<T> extends StreamSinkBase<T> implements StreamController<T> {
+
+  _EntangledController(this._buffer, this._isController1);
   /// The buffer that this wraps.
   final _EntangledBuffer<T> _buffer;
 
@@ -167,39 +169,55 @@ class _EntangledController<T> extends StreamSinkBase<T> implements StreamControl
 
   StreamController<T> get _outputController => _isController1 ? _buffer.controller1 : _buffer.controller2;
 
+  @override
   Future<void> get done => _outputController.done;
+  @override
   bool get hasListener => _outputController.hasListener;
+  @override
   bool get isClosed => _outputController.isClosed;
+  @override
   bool get isPaused => _outputController.isPaused;
+  @override
   Stream<T> get stream => _outputController.stream;
 
+  @override
   FutureOr<void> Function()? get onCancel => _outputController.onCancel;
+  @override
   set onCancel(FutureOr<void> Function()? value) => _outputController.onCancel = value;
 
+  @override
   void Function()? get onListen => _outputController.onListen;
+  @override
   set onListen(void Function()? value) => throw UnsupportedError("Entangled controllers can't set onListen");
 
+  @override
   void Function()? get onPause => _outputController.onPause;
+  @override
   set onPause(void Function()? value) => _outputController.onPause = value;
 
+  @override
   void Function()? get onResume => _outputController.onResume;
+  @override
   set onResume(void Function()? value) => _outputController.onResume = value;
 
+  @override
   StreamSink<T> get sink => this;
 
-  _EntangledController(this._buffer, this._isController1);
-
+  @override
   Future<void> addStream(Stream<T> stream, {bool? cancelOnError}) {
-    if (cancelOnError == true) {
+    if (cancelOnError ?? false) {
       stream = stream.transform(StreamTransformer((stream, _) => stream.listen(null, cancelOnError: true)));
     }
 
     return super.addStream(stream);
   }
 
+  @override
   void onAdd(T event) => _buffer.add(_isController1, event);
 
+  @override
   void onError(Object error, [StackTrace? stackTrace]) => _buffer.addError(_isController1, error, stackTrace);
 
+  @override
   void onClose() => _buffer.close(_isController1);
 }

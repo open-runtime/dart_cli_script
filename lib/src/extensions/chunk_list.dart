@@ -20,7 +20,7 @@ extension ChunkListExtensions on List<List<int>> {
   ///
   /// Returns [script].
   Script operator |(Script script) {
-    for (var chunk in this) {
+    for (final chunk in this) {
       script.stdin.add(chunk);
     }
     script.stdin.close();

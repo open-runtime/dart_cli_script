@@ -27,7 +27,7 @@ import '../util.dart';
 extension ByteStreamExtensions on Stream<List<int>> {
   /// Returns the full UTF-8 text produced by [this], with trailing newlines removed.
   Future<String> get text async {
-    var text = const Utf8Decoder(allowMalformed: true).convert(await collectBytes(this));
+    final text = const Utf8Decoder(allowMalformed: true).convert(await collectBytes(this));
 
     var i = text.length - 1;
     while (i >= 0 && text.codeUnitAt(i) == $lf) {
@@ -64,13 +64,13 @@ extension ByteStreamExtensions on Stream<List<int>> {
   /// exits with [Script.exitCode] `143`, or `false` if the stream was already
   /// closed.
   Script get _asScript {
-    var signalCloser = StreamCloser<List<int>>();
-    return Script.fromComponents("stream", () {
-      var exitCodeCompleter = Completer<int>.sync();
+    final signalCloser = StreamCloser<List<int>>();
+    return Script.fromComponents('stream', () {
+      final exitCodeCompleter = Completer<int>.sync();
       return ScriptComponents(
           NullStreamSink(),
           transform(signalCloser).onDone(() => exitCodeCompleter.complete(signalCloser.isClosed ? 143 : 0)),
-          Stream.empty(),
+          const Stream.empty(),
           exitCodeCompleter.future);
     }, onSignal: (_) {
       signalCloser.close();

@@ -16,71 +16,70 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:test/test.dart';
-
 import 'package:cli_script/cli_script.dart';
+import 'package:test/test.dart';
 
 import 'util.dart';
 
 void main() {
   test("pipes one script's stdout into another's stdin", () {
-    var pipeline = mainScript('print("hello!");') |
+    final pipeline = mainScript('print("hello!");') |
         Script.capture((stdin) async {
-          await expectLater(stdin.lines, emits("hello!"));
+          await expectLater(stdin.lines, emits('hello!'));
         });
     expect(pipeline.done, completes);
   });
 
   test("pipes the pipeline's stdin into the first script's stdin", () {
-    var pipeline =
+    final pipeline =
         mainScript('print("a: " + stdin.readLineSync()!);') | mainScript('print("b: " + stdin.readLineSync()!);');
-    pipeline.stdin.writeln("hello!");
-    expect(pipeline.stdout.lines, emits("b: a: hello!"));
+    pipeline.stdin.writeln('hello!');
+    expect(pipeline.stdout.lines, emits('b: a: hello!'));
   });
 
-  test("pipes a scriptlike object", () {
-    var pipeline = mainScript('stdout.add(zlib.encode(utf8.encode("hello!")));') | zlib.decoder;
-    expect(pipeline.stdout.lines, emits("hello!"));
+  test('pipes a scriptlike object', () {
+    final pipeline = mainScript('stdout.add(zlib.encode(utf8.encode("hello!")));') | zlib.decoder;
+    expect(pipeline.stdout.lines, emits('hello!'));
   });
 
   group("pipes many scripts' stdios together", () {
-    test("with Script.pipeline", () {
-      var pipeline = Script.pipeline([
+    test('with Script.pipeline', () {
+      final pipeline = Script.pipeline([
         mainScript('print("a: " + stdin.readLineSync()!);'),
         mainScript('print("b: " + stdin.readLineSync()!);'),
         mainScript('print("c: " + stdin.readLineSync()!);'),
         mainScript('print("d: " + stdin.readLineSync()!);')
       ]);
-      pipeline.stdin.writeln("hello!");
-      expect(pipeline.stdout.lines, emits("d: c: b: a: hello!"));
+      pipeline.stdin.writeln('hello!');
+      expect(pipeline.stdout.lines, emits('d: c: b: a: hello!'));
     });
 
-    test("with repeated |", () {
-      var pipeline = mainScript('print("a: " + stdin.readLineSync()!);') |
+    test('with repeated |', () {
+      final pipeline = mainScript('print("a: " + stdin.readLineSync()!);') |
           mainScript('print("b: " + stdin.readLineSync()!);') |
           mainScript('print("c: " + stdin.readLineSync()!);') |
           mainScript('print("d: " + stdin.readLineSync()!);');
-      pipeline.stdin.writeln("hello!");
-      expect(pipeline.stdout.lines, emits("d: c: b: a: hello!"));
+      pipeline.stdin.writeln('hello!');
+      expect(pipeline.stdout.lines, emits('d: c: b: a: hello!'));
     });
   });
 
   test("only includes the last script's stderr in the pipeline's", () {
     late Script pipeline;
-    var captured = Script.capture((_) {
+    final captured = Script.capture((_) {
       pipeline = mainScript('stderr.writeln("script 1");') | mainScript('stderr.writeln("script 2");');
     });
 
-    expect(captured.stderr.lines, emits("script 1"));
-    expect(pipeline.stderr.lines, emits("script 2"));
+    expect(captured.stderr.lines, emits('script 1'));
+    expect(pipeline.stderr.lines, emits('script 2'));
   });
 
-  group("on exit", () {
-    group("if both succeed, waits for both scripts to exit", () {
-      test("if the first exits first", () async {
-        var completer = Completer<void>();
-        var script1 = mainScript("");
-        var pipeline = script1 | Script.capture((_) => completer.future);
+  group('on exit', () {
+    group('if both succeed, waits for both scripts to exit', () {
+      test('if the first exits first', () async {
+        final completer = Completer<void>();
+        final script1 = mainScript('');
+        final pipeline = script1 | Script.capture((_) => completer.future);
 
         var doneCompleted = false;
         pipeline.done.then((_) => doneCompleted = true);
@@ -93,10 +92,10 @@ void main() {
         expect(doneCompleted, isTrue);
       });
 
-      test("if the second exits first", () async {
-        var completer = Completer<void>();
-        var script2 = mainScript("");
-        var pipeline = Script.capture((_) => completer.future) | script2;
+      test('if the second exits first', () async {
+        final completer = Completer<void>();
+        final script2 = mainScript('');
+        final pipeline = Script.capture((_) => completer.future) | script2;
 
         var doneCompleted = false;
         pipeline.done.then((_) => doneCompleted = true);
@@ -110,13 +109,13 @@ void main() {
       });
     });
 
-    group("if one fails", () {
-      group("waits for both scripts to exit and returns the failing exit code", () {
-        group("if the first exits first", () {
-          test("and the first fails", () async {
-            var completer = Completer<void>();
-            var script1 = mainScript("exitCode = 123;");
-            var pipeline = script1 | Script.capture((_) => completer.future);
+    group('if one fails', () {
+      group('waits for both scripts to exit and returns the failing exit code', () {
+        group('if the first exits first', () {
+          test('and the first fails', () async {
+            final completer = Completer<void>();
+            final script1 = mainScript('exitCode = 123;');
+            final pipeline = script1 | Script.capture((_) => completer.future);
 
             int? exitCode;
             pipeline.exitCode.then((exitCode_) => exitCode = exitCode_);
@@ -129,13 +128,13 @@ void main() {
             expect(exitCode, equals(123));
           });
 
-          test("and the second fails", () async {
-            var completer = Completer<void>();
-            var script1 = mainScript("");
-            var pipeline = script1 |
+          test('and the second fails', () async {
+            final completer = Completer<void>();
+            final script1 = mainScript('');
+            final pipeline = script1 |
                 Script.capture((_) async {
                   await completer.future;
-                  throw "oh no";
+                  throw 'oh no';
                 });
 
             // Don't print the unhandled error.
@@ -153,20 +152,20 @@ void main() {
           });
         });
 
-        group("if the second exits first", () {
-          test("and the first fails", () async {
-            var completer = Completer<void>();
+        group('if the second exits first', () {
+          test('and the first fails', () async {
+            final completer = Completer<void>();
 
-            var capture = Script.capture((_) async {
+            final capture = Script.capture((_) async {
               await completer.future;
-              throw "oh no";
+              throw 'oh no';
             });
 
             // Don't print the unhandled error.
             capture.stderr.listen(null);
 
-            var script2 = mainScript("");
-            var pipeline = capture | script2;
+            final script2 = mainScript('');
+            final pipeline = capture | script2;
 
             int? exitCode;
             pipeline.exitCode.then((exitCode_) => exitCode = exitCode_);
@@ -179,10 +178,10 @@ void main() {
             expect(exitCode, equals(257));
           });
 
-          test("and the second fails", () async {
-            var completer = Completer<void>();
-            var script2 = mainScript("exitCode = 123;");
-            var pipeline = Script.capture((_) => completer.future) | script2;
+          test('and the second fails', () async {
+            final completer = Completer<void>();
+            final script2 = mainScript('exitCode = 123;');
+            final pipeline = Script.capture((_) => completer.future) | script2;
 
             int? exitCode;
             pipeline.exitCode.then((exitCode_) => exitCode = exitCode_);
@@ -199,17 +198,17 @@ void main() {
 
       group(
           "the error isn't top-leveled if it's handled only at the pipeline "
-          "level", () {
-        test("if the first fails", () async {
-          var pipeline = mainScript("exitCode = 1;") | mainScript("");
+          'level', () {
+        test('if the first fails', () async {
+          final pipeline = mainScript('exitCode = 1;') | mainScript('');
           expect(await pipeline.exitCode, equals(1));
 
           // Give time for an unhandled error to be top-leveled.
           await pumpEventQueue();
         });
 
-        test("if the second fails", () async {
-          var pipeline = mainScript("") | mainScript("exitCode = 1;");
+        test('if the second fails', () async {
+          final pipeline = mainScript('') | mainScript('exitCode = 1;');
           expect(await pipeline.exitCode, equals(1));
 
           // Give time for an unhandled error to be top-leveled.
@@ -218,15 +217,15 @@ void main() {
       });
     });
 
-    group("if both fail", () {
-      group("returns the last exit code", () {
-        test("if the first exits first", () async {
-          var completer = Completer<void>();
-          var script1 = mainScript("exitCode = 123;");
-          var pipeline = script1 |
+    group('if both fail', () {
+      group('returns the last exit code', () {
+        test('if the first exits first', () async {
+          final completer = Completer<void>();
+          final script1 = mainScript('exitCode = 123;');
+          final pipeline = script1 |
               Script.capture((_) async {
                 await completer.future;
-                throw "oh no";
+                throw 'oh no';
               });
 
           // Don't print the unhandled error.
@@ -243,19 +242,19 @@ void main() {
           expect(exitCode, equals(257));
         });
 
-        test("if the last exits first", () async {
-          var completer = Completer<void>();
+        test('if the last exits first', () async {
+          final completer = Completer<void>();
 
-          var capture = Script.capture((_) async {
+          final capture = Script.capture((_) async {
             await completer.future;
-            throw "oh no";
+            throw 'oh no';
           });
 
           // Don't print the unhandled error.
           capture.stderr.listen(null);
 
-          var script2 = mainScript("exitCode = 123;");
-          var pipeline = capture | script2;
+          final script2 = mainScript('exitCode = 123;');
+          final pipeline = capture | script2;
 
           int? exitCode;
           pipeline.exitCode.then((exitCode_) => exitCode = exitCode_);
@@ -271,8 +270,8 @@ void main() {
 
       test(
           "the error isn't top-leveled if it's handled only at the pipeline "
-          "level", () async {
-        var pipeline = mainScript("exitCode = 1;") | mainScript("exitCode = 2;");
+          'level', () async {
+        final pipeline = mainScript('exitCode = 1;') | mainScript('exitCode = 2;');
         expect(await pipeline.exitCode, equals(2));
 
         // Give time for an unhandled error to be top-leveled.
@@ -281,59 +280,59 @@ void main() {
     });
   });
 
-  group("pipes in", () {
-    group("a byte stream", () {
-      test("without errors", () {
-        var pipeline = Stream<List<int>>.fromIterable([utf8.encode("foo"), utf8.encode("bar")]) |
-            mainScript("stdin.pipe(stdout);");
-        expect(pipeline.stdout.lines, emitsInOrder(["foobar", emitsDone]));
+  group('pipes in', () {
+    group('a byte stream', () {
+      test('without errors', () {
+        final pipeline = Stream<List<int>>.fromIterable([utf8.encode('foo'), utf8.encode('bar')]) |
+            mainScript('stdin.pipe(stdout);');
+        expect(pipeline.stdout.lines, emitsInOrder(['foobar', emitsDone]));
       });
 
-      test("with an error", () {
-        var capture = Script.capture((_) {
-          var pipeline = Stream<List<int>>.error("oh no") | mainScript("");
+      test('with an error', () {
+        final capture = Script.capture((_) {
+          final pipeline = Stream<List<int>>.error('oh no') | mainScript('');
           expect(pipeline.exitCode, completion(equals(257)));
         });
 
-        expect(capture.stderr.lines, emitsThrough(contains("oh no")));
+        expect(capture.stderr.lines, emitsThrough(contains('oh no')));
         expect(capture.done, completes);
       });
     });
 
-    group("a string stream", () {
-      test("without errors", () {
-        var pipeline = Stream.fromIterable(["foo", "bar"]) | mainScript("stdin.pipe(stdout);");
-        expect(pipeline.stdout.lines, emitsInOrder(["foo", "bar", emitsDone]));
+    group('a string stream', () {
+      test('without errors', () {
+        final pipeline = Stream.fromIterable(['foo', 'bar']) | mainScript('stdin.pipe(stdout);');
+        expect(pipeline.stdout.lines, emitsInOrder(['foo', 'bar', emitsDone]));
       });
 
-      test("with an error", () {
-        var capture = Script.capture((_) {
-          var pipeline = Stream<String>.error("oh no") | mainScript("");
+      test('with an error', () {
+        final capture = Script.capture((_) {
+          final pipeline = Stream<String>.error('oh no') | mainScript('');
           expect(pipeline.exitCode, completion(equals(257)));
         });
 
-        expect(capture.stderr.lines, emitsThrough(contains("oh no")));
+        expect(capture.stderr.lines, emitsThrough(contains('oh no')));
       });
     });
 
-    test("a chunk list", () {
-      var pipeline = [utf8.encode("foo"), utf8.encode("bar")] | mainScript("stdin.pipe(stdout);");
-      expect(pipeline.stdout.lines, emitsInOrder(["foobar", emitsDone]));
+    test('a chunk list', () {
+      final pipeline = [utf8.encode('foo'), utf8.encode('bar')] | mainScript('stdin.pipe(stdout);');
+      expect(pipeline.stdout.lines, emitsInOrder(['foobar', emitsDone]));
     });
 
-    test("a byte list", () {
-      var pipeline = utf8.encode("foobar") | mainScript("stdin.pipe(stdout);");
-      expect(pipeline.stdout.lines, emitsInOrder(["foobar", emitsDone]));
+    test('a byte list', () {
+      final pipeline = utf8.encode('foobar') | mainScript('stdin.pipe(stdout);');
+      expect(pipeline.stdout.lines, emitsInOrder(['foobar', emitsDone]));
     });
 
-    test("a string list", () {
-      var pipeline = ["foo", "bar"] | mainScript("stdin.pipe(stdout);");
-      expect(pipeline.stdout.lines, emitsInOrder(["foo", "bar", emitsDone]));
+    test('a string list', () {
+      final pipeline = ['foo', 'bar'] | mainScript('stdin.pipe(stdout);');
+      expect(pipeline.stdout.lines, emitsInOrder(['foo', 'bar', emitsDone]));
     });
 
-    test("a string", () {
-      var pipeline = "foobar" | mainScript("stdin.pipe(stdout);");
-      expect(pipeline.stdout.lines, emitsInOrder(["foobar", emitsDone]));
+    test('a string', () {
+      final pipeline = 'foobar' | mainScript('stdin.pipe(stdout);');
+      expect(pipeline.stdout.lines, emitsInOrder(['foobar', emitsDone]));
     });
   });
 }

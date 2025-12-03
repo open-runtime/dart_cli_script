@@ -44,8 +44,8 @@ const _slugCharacters = 16;
 /// basename. If [suffix] is passed, it's added to the end. If [parent] is
 /// passed, it's used as the parent directory for the path; it defaults to
 /// [Directory.systemTemp].
-T withTempPath<T>(T callback(String path), {String? prefix, String? suffix, String? parent}) {
-  var path = _tempPathName(prefix, suffix, parent);
+T withTempPath<T>(T Function(String path) callback, {String? prefix, String? suffix, String? parent}) {
+  final path = _tempPathName(prefix, suffix, parent);
   return tryFinally(() => callback(path), () {
     try {
       File(path).deleteSync(recursive: true);
@@ -61,9 +61,9 @@ T withTempPath<T>(T callback(String path), {String? prefix, String? suffix, Stri
 /// Note that even [withTempPath] can safely be used with an asynchronous
 /// [callback]. This function is only necessary if you need the automatic
 /// filesystem operations to be asynchronous.
-Future<T> withTempPathAsync<T>(FutureOr<T> callback(String path),
+Future<T> withTempPathAsync<T>(FutureOr<T> Function(String path) callback,
     {String? prefix, String? suffix, String? parent}) async {
-  var path = _tempPathName(prefix, suffix, parent);
+  final path = _tempPathName(prefix, suffix, parent);
   try {
     return await callback(path);
   } finally {
@@ -88,7 +88,7 @@ Future<T> withTempPathAsync<T>(FutureOr<T> callback(String path),
 /// directory's basename. If [suffix] is passed, it's added to the end. If
 /// [parent] is passed, the temporary directory is created within that path;
 /// otherwise, it's created within [Directory.systemTemp].
-T withTempDir<T>(T callback(String dir), {String? prefix, String? suffix, String? parent}) => withTempPath((path) {
+T withTempDir<T>(T Function(String dir) callback, {String? prefix, String? suffix, String? parent}) => withTempPath((path) {
       Directory(path).createSync();
       return callback(path);
     }, prefix: prefix, suffix: suffix, parent: parent);
@@ -99,7 +99,7 @@ T withTempDir<T>(T callback(String dir), {String? prefix, String? suffix, String
 /// Note that even [withTempDir] can safely be used with an asynchronous
 /// [callback]. This function is only necessary if you need the automatic
 /// filesystem operations to be asynchronous.
-Future<T> withTempDirAsync<T>(FutureOr<T> callback(String dir), {String? prefix, String? suffix, String? parent}) =>
+Future<T> withTempDirAsync<T>(FutureOr<T> Function(String dir) callback, {String? prefix, String? suffix, String? parent}) =>
     withTempPathAsync((path) async {
       await Directory(path).create();
       return await callback(path);
@@ -108,14 +108,14 @@ Future<T> withTempDirAsync<T>(FutureOr<T> callback(String dir), {String? prefix,
 /// Returns the name of a temporary path within [parent] with the given [prefix]
 /// and [suffix].
 String _tempPathName(String? prefix, String? suffix, String? parent) {
-  var slug = String.fromCharCodes(Iterable.generate(_slugCharacters, (_) => _randomAlphanumeric()));
+  final slug = String.fromCharCodes(Iterable.generate(_slugCharacters, (_) => _randomAlphanumeric()));
   return p.join(parent ?? Directory.systemTemp.path, "${prefix ?? ''}$slug${suffix ?? ''}");
 }
 
 /// Returns a random alphanumeric character.
 int _randomAlphanumeric() {
   // Don't generate uppercase letters on Windows since it's case-insensitive.
-  var index = _random.nextInt(10 + 26 * (Platform.isWindows ? 1 : 2));
+  final index = _random.nextInt(10 + 26 * (Platform.isWindows ? 1 : 2));
   if (index < 10) return $0 + index;
   if (index < 36) return index - 10 + $a;
   return index - 36 + $A;

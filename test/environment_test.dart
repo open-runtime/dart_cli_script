@@ -14,104 +14,103 @@
 
 import 'dart:io';
 
-import 'package:test/test.dart';
-
 import 'package:cli_script/cli_script.dart';
+import 'package:test/test.dart';
 
 import 'util.dart';
 
 void main() {
-  group("env", () {
-    test("is equal to Platform.environment by default", () {
+  group('env', () {
+    test('is equal to Platform.environment by default', () {
       expect(env, equals(Platform.environment));
     });
 
-    test("can set new variables", () {
-      var varName = uid();
-      env[varName] = "value";
-      expect(env, containsPair(varName, "value"));
+    test('can set new variables', () {
+      final varName = uid();
+      env[varName] = 'value';
+      expect(env, containsPair(varName, 'value'));
     });
 
-    group("with a non-empty environment", () {
-      test("can override existing variables", () {
-        var varName = Platform.environment.keys.first;
-        env[varName] = "new special fancy value";
-        expect(env, containsPair(varName, "new special fancy value"));
+    group('with a non-empty environment', () {
+      test('can override existing variables', () {
+        final varName = Platform.environment.keys.first;
+        env[varName] = 'new special fancy value';
+        expect(env, containsPair(varName, 'new special fancy value'));
       });
 
-      test("can remove existing variables", () {
-        var varName = Platform.environment.keys.last;
+      test('can remove existing variables', () {
+        final varName = Platform.environment.keys.last;
         env.remove(varName);
         expect(env, isNot(contains(varName)));
       });
-    }, skip: Platform.environment.isEmpty ? "These tests require at least one environment variable to be set" : null);
+    }, skip: Platform.environment.isEmpty ? 'These tests require at least one environment variable to be set' : null);
   });
 
-  group("withEnv", () {
-    group("with an empty environment", () {
+  group('withEnv', () {
+    group('with an empty environment', () {
       test("returns the callback's return value", () {
         expect(withEnv(() => 42, {}), equals(42));
       });
 
-      test("copies the outer environment", () {
-        var outerEnv = Map.of(env);
+      test('copies the outer environment', () {
+        final outerEnv = Map.of(env);
         withEnv(expectAsync0(() => expect(env, equals(outerEnv))), {});
       });
 
       test("inner modifications don't modify the outer environment", () {
-        var varName = uid();
+        final varName = uid();
         withEnv(expectAsync0(() {
-          env[varName] = "value";
-          expect(env, containsPair(varName, "value"));
+          env[varName] = 'value';
+          expect(env, containsPair(varName, 'value'));
         }), {});
         expect(env, isNot(contains(varName)));
       });
 
-      test("with includeParentEnvironment: false creates an empty environment", () {
+      test('with includeParentEnvironment: false creates an empty environment', () {
         withEnv(expectAsync0(() => expect(env, isEmpty)), {}, includeParentEnvironment: false);
       });
     });
 
-    test("overrides outer variables", () {
-      var varName = uid();
-      env[varName] = "outer value";
-      withEnv(expectAsync0(() => expect(env, containsPair(varName, "inner value"))), {varName: "inner value"});
-      expect(env, containsPair(varName, "outer value"));
+    test('overrides outer variables', () {
+      final varName = uid();
+      env[varName] = 'outer value';
+      withEnv(expectAsync0(() => expect(env, containsPair(varName, 'inner value'))), {varName: 'inner value'});
+      expect(env, containsPair(varName, 'outer value'));
     });
 
-    test("removes outer variables with value null", () {
-      var varName = uid();
-      env[varName] = "outer value";
+    test('removes outer variables with value null', () {
+      final varName = uid();
+      env[varName] = 'outer value';
       withEnv(expectAsync0(() => expect(env, isNot(contains(varName)))), {varName: null});
-      expect(env, containsPair(varName, "outer value"));
+      expect(env, containsPair(varName, 'outer value'));
     });
 
-    test("replaces the outer environment with includeParentEnvironment: false", () {
-      withEnv(expectAsync0(() => expect(env, equals({"FOO": "bar"}))), {"FOO": "bar"}, includeParentEnvironment: false);
+    test('replaces the outer environment with includeParentEnvironment: false', () {
+      withEnv(expectAsync0(() => expect(env, equals({'FOO': 'bar'}))), {'FOO': 'bar'}, includeParentEnvironment: false);
     });
   });
 
-  group("on Windows", () {
-    test("environment variables are accessed case-insensitively", () {
-      var varName = uid();
-      env[varName] = "value";
-      expect(env, containsPair(varName.toUpperCase(), "value"));
+  group('on Windows', () {
+    test('environment variables are accessed case-insensitively', () {
+      final varName = uid();
+      env[varName] = 'value';
+      expect(env, containsPair(varName.toUpperCase(), 'value'));
     });
 
-    test("environment variables are removed case-insensitively", () {
-      var varName = uid();
-      env[varName] = "value";
+    test('environment variables are removed case-insensitively', () {
+      final varName = uid();
+      env[varName] = 'value';
       env.remove(varName.toUpperCase());
       expect(env, isNot(contains(varName)));
       expect(env, isNot(contains(varName.toUpperCase())));
     });
 
-    test("environment variables are overridden case-insensitively", () {
-      var varName = uid();
-      env[varName] = "outer value";
+    test('environment variables are overridden case-insensitively', () {
+      final varName = uid();
+      env[varName] = 'outer value';
       env.remove(varName.toUpperCase());
-      withEnv(expectAsync0(() => expect(env, containsPair(varName, "inner value"))),
-          {varName.toUpperCase(): "inner value"});
+      withEnv(expectAsync0(() => expect(env, containsPair(varName, 'inner value'))),
+          {varName.toUpperCase(): 'inner value'});
     });
   }, testOn: 'windows');
 }

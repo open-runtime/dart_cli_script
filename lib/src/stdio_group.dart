@@ -29,6 +29,12 @@ import 'util/sink_base.dart';
 /// the same purpose but is unaffected by [sink] being closed or locked by
 /// [Sink.addStream].
 class StdioGroup {
+
+  StdioGroup() : this._(StreamController(sync: true));
+
+  StdioGroup._(this._sinkController) : sink = _StdioGroupSink(_sinkController.sink) {
+    _group.add(_sinkController.stream);
+  }
   /// The inner stream group that handles all the heavy lifting of merging
   /// streams.
   final _group = StreamGroup<List<int>>();
@@ -43,14 +49,8 @@ class StdioGroup {
   final StreamController<List<int>> _sinkController;
 
   static Tuple2<StdioGroup, StdioGroup> entangled() {
-    var controllers = createEntangledControllers<List<int>>();
+    final controllers = createEntangledControllers<List<int>>();
     return Tuple2(StdioGroup._(controllers.item1), StdioGroup._(controllers.item2));
-  }
-
-  StdioGroup() : this._(StreamController(sync: true));
-
-  StdioGroup._(this._sinkController) : sink = _StdioGroupSink(_sinkController.sink) {
-    _group.add(_sinkController.stream);
   }
 
   /// See [StreamGroup.add].
@@ -59,9 +59,9 @@ class StdioGroup {
   /// Writes [object] to [stream] like [IOSink.writeln].
   ///
   /// This can be called even if [sink] is closed or locked by [Sink.addStream].
-  void writeln([Object? object = ""]) => _sinkController
+  void writeln([Object? object = '']) => _sinkController
     ..add(sink.encoding.encode(object.toString()))
-    ..add(sink.encoding.encode("\n"));
+    ..add(sink.encoding.encode('\n'));
 
   /// See [StreamGroup.close].
   Future<void> close() {
@@ -73,19 +73,23 @@ class StdioGroup {
 /// A custom [IOSink] that doesn't actually close the underlying sink when it's
 /// closed.
 class _StdioGroupSink extends IOSinkBase implements IOSink {
-  /// The underlying sink.
-  final StreamSink<List<int>> _sink;
 
   _StdioGroupSink(this._sink) {
     encoding = utf8;
   }
+  /// The underlying sink.
+  final StreamSink<List<int>> _sink;
 
+  @override
   void onAdd(List<int> data) => _sink.add(data);
 
+  @override
   void onError(Object error, [StackTrace? stackTrace]) => _sink.addError(error, stackTrace);
 
+  @override
   void onClose() {}
 
   /// All writes are flushed automatically as soon as the stream is listened.
+  @override
   Future<void> onFlush() => Future.value();
 }

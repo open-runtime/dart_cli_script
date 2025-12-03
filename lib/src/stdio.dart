@@ -21,11 +21,11 @@ import 'stdio_group.dart';
 
 /// An opaque key for the Zone value that contains the [StdioGroup] for the
 /// current captured stdout context.
-final Object stdoutKey = #_stdoutKey;
+const Object stdoutKey = #_stdoutKey;
 
 /// An opaque key for the Zone value that contains the [StdioGroup] for the
 /// current captured stderr context.
-final Object stderrKey = #_stderrKey;
+const Object stderrKey = #_stderrKey;
 
 /// Returns a sink for writing directly to the current stdout stream.
 ///
@@ -35,7 +35,7 @@ final Object stderrKey = #_stderrKey;
 /// This should not be closed, and error events should not be emitted on it. It
 /// should not be stored, as a given value may become invalid later on.
 IOSink get currentStdout {
-  var fromZone = Zone.current[stdoutKey];
+  final fromZone = Zone.current[stdoutKey];
   return fromZone is StdioGroup ? fromZone.sink : stdout;
 }
 
@@ -47,7 +47,7 @@ IOSink get currentStdout {
 /// This should not be closed, and error events should not be emitted on it. It
 /// should not be stored, as a given value may become invalid later on.
 IOSink get currentStderr {
-  var fromZone = Zone.current[stderrKey];
+  final fromZone = Zone.current[stderrKey];
   return fromZone is StdioGroup ? fromZone.sink : stderr;
 }
 
@@ -56,8 +56,8 @@ IOSink get currentStderr {
 ///
 /// Returns the same result as [callback]. Doesn't add any special error
 /// handling.
-T silenceStdout<T>(T callback()) {
-  var group = StdioGroup();
+T silenceStdout<T>(T Function() callback) {
+  final group = StdioGroup();
   group.stream.drain<void>();
   return runZoned(callback,
       zoneValues: {stdoutKey: group}, zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}));
@@ -67,8 +67,8 @@ T silenceStdout<T>(T callback()) {
 ///
 /// Returns the same result as [callback]. Doesn't add any special error
 /// handling.
-T silenceStderr<T>(T callback()) {
-  var group = StdioGroup();
+T silenceStderr<T>(T Function() callback) {
+  final group = StdioGroup();
   group.stream.drain<void>();
   return runZoned(callback, zoneValues: {stderrKey: group});
 }
@@ -78,8 +78,8 @@ T silenceStderr<T>(T callback()) {
 ///
 /// Returns the same result as [callback]. Doesn't add any special error
 /// handling.
-T silenceOutput<T>(T callback()) {
-  var group = StdioGroup();
+T silenceOutput<T>(T Function() callback) {
+  final group = StdioGroup();
   group.stream.drain<void>();
   return runZoned(callback,
       zoneValues: {stdoutKey: group, stderrKey: group},
@@ -102,7 +102,7 @@ T silenceOutput<T>(T callback()) {
 /// appropriately. When no [onSignal] handler was set, calling [kill] will do
 /// nothing and return `false`.
 Script silenceUntilFailure(FutureOr<void> Function(Stream<List<int>> stdin) callback,
-    {String? name, bool? when, bool stderrOnly = false, bool onSignal(ProcessSignal signal)?}) {
+    {String? name, bool? when, bool stderrOnly = false, bool Function(ProcessSignal signal)? onSignal}) {
   // Wrap this in an additional [Script.capture] so that we can both handle the
   // failure *and* still have it be top-leveled if it's not handled by the
   // caller.
@@ -112,7 +112,7 @@ Script silenceUntilFailure(FutureOr<void> Function(Stream<List<int>> stdin) call
       return;
     }
 
-    var script = BufferedScript.capture((_) => callback(stdin),
+    final script = BufferedScript.capture((_) => callback(stdin),
         name: name == null ? null : '$name.inner', stderrOnly: stderrOnly);
 
     try {

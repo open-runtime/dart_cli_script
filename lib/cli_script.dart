@@ -33,16 +33,16 @@ import 'src/util/named_stream_transformer.dart';
 export 'src/buffered_script.dart';
 export 'src/cli_arguments.dart' show arg, args;
 export 'src/environment.dart';
+export 'src/exception.dart';
 export 'src/extensions/byte_list.dart';
 export 'src/extensions/byte_stream.dart';
 export 'src/extensions/chunk_list.dart';
+export 'src/extensions/line_and_span_stream.dart';
 export 'src/extensions/line_list.dart';
 export 'src/extensions/line_stream.dart';
-export 'src/extensions/line_and_span_stream.dart';
 export 'src/extensions/string.dart';
-export 'src/exception.dart';
 export 'src/script.dart' hide scriptNameKey;
-export 'src/stdio.dart' hide stdoutKey, stderrKey;
+export 'src/stdio.dart' hide stderrKey, stdoutKey;
 export 'src/temp.dart';
 
 /// A wrapper for the body of the top-level `main()` method.
@@ -64,7 +64,7 @@ export 'src/temp.dart';
 /// If [debug] is `true`, extra information about [Script]s' lifecycles will be
 /// printed directly to stderr. As the name suggests, this is intended for use
 /// only when debugging.
-void wrapMain(FutureOr<void> callback(),
+void wrapMain(FutureOr<void> Function() callback,
     {bool chainStackTraces = true, bool? printScriptException, bool verboseTrace = false, bool debug = false}) {
   withConfig(() {
     Chain.capture(callback, onError: (error, chain) {
@@ -200,7 +200,7 @@ Future<bool> check(String executableAndArgs,
 Never fail(String message, {int exitCode = 1}) {
   currentStderr.writeln(message);
 
-  var scriptName = Zone.current[scriptNameKey];
+  final scriptName = Zone.current[scriptNameKey];
   if (scriptName is String) {
     throw ScriptException(scriptName, exitCode);
   } else {
@@ -222,7 +222,7 @@ Never fail(String message, {int exitCode = 1}) {
 /// at the same time as [exclude].
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-/// [new RegExp].
+/// [RegExp.new].
 StreamTransformer<String, String> grep(String regexp,
     {bool exclude = false,
     bool onlyMatching = false,
@@ -234,7 +234,7 @@ StreamTransformer<String, String> grep(String regexp,
   }
 
   return NamedStreamTransformer.fromBind(
-      "grep",
+      'grep',
       (stream) => stream.grep(regexp,
           exclude: exclude,
           onlyMatching: onlyMatching,
@@ -253,11 +253,11 @@ StreamTransformer<String, String> grep(String regexp,
 /// followed by a number return the character immediately following them.
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-/// [new RegExp].
+/// [RegExp.new].
 StreamTransformer<String, String> replace(String regexp, String replacement,
         {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
     NamedStreamTransformer.fromBind(
-        "replace",
+        'replace',
         (stream) => stream.replace(regexp, replacement,
             all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll));
 
@@ -268,11 +268,11 @@ StreamTransformer<String, String> replace(String regexp, String replacement,
 /// replaces all matches in each line instead.
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
-/// [new RegExp].
-StreamTransformer<String, String> replaceMapped(String regexp, String replace(Match match),
+/// [RegExp.new].
+StreamTransformer<String, String> replaceMapped(String regexp, String Function(Match match) replace,
         {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
     NamedStreamTransformer.fromBind(
-        "replaceMapped",
+        'replaceMapped',
         (stream) => stream.replaceMapped(regexp, replace,
             all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll));
 
@@ -280,7 +280,7 @@ StreamTransformer<String, String> replaceMapped(String regexp, String replace(Ma
 /// prints each string to [currentStderr].
 ///
 /// This is primarily intended for debugging.
-final teeToStderr = NamedStreamTransformer<String, String>.fromBind("teeToStderr", (stream) => stream.teeToStderr);
+final teeToStderr = NamedStreamTransformer<String, String>.fromBind('teeToStderr', (stream) => stream.teeToStderr);
 
 /// A shorthand for opening the file at [path] as a stream.
 ///
@@ -391,8 +391,8 @@ IOSink append(String path) => File(path).openWrite(mode: FileMode.append);
 ///
 /// See also [LineStreamExtensions.xargs], which takes arguments directly from
 /// an existing string stream rather than [stdin].
-Script xargs(FutureOr<void> callback(List<String> args),
-    {int? maxArgs, String? name, void onSignal(ProcessSignal signal)?}) {
+Script xargs(FutureOr<void> Function(List<String> args) callback,
+    {int? maxArgs, String? name, void Function(ProcessSignal signal)? onSignal}) {
   if (maxArgs != null && maxArgs < 1) {
     throw RangeError.range(maxArgs, 1, null, 'maxArgs');
   }
@@ -410,6 +410,6 @@ Script xargs(FutureOr<void> callback(List<String> args),
 ///
 /// If [root] is passed, it's used as the root directory for relative globs.
 Stream<String> ls(String glob, {String? root}) {
-  var absolute = p.isAbsolute(glob);
+  final absolute = p.isAbsolute(glob);
   return Glob(glob).list(root: root).map((entity) => absolute ? entity.path : p.relative(entity.path, from: root));
 }

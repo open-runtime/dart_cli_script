@@ -20,7 +20,7 @@ extension LineListExtensions on List<String> {
   ///
   /// Returns [script].
   Script operator |(Script script) {
-    for (var line in this) {
+    for (final line in this) {
       script.stdin.writeln(line);
     }
     script.stdin.close();

@@ -22,11 +22,6 @@ import 'package:string_scanner/string_scanner.dart';
 
 /// CLI arguments parsed from a `executableAndArgs` string.
 class CliArguments {
-  /// The executable to run.
-  final String executable;
-
-  /// The arguments to the executable, with globs not yet resolved.
-  final List<_Argument> _arguments;
 
   /// Parses [argString], a shell-style string of space-separated arguments,
   /// into a list of separate arguments.
@@ -40,15 +35,15 @@ class CliArguments {
   factory CliArguments.parse(String argString, {bool? glob}) {
     glob ??= !Platform.isWindows;
 
-    var scanner = StringScanner(argString);
+    final scanner = StringScanner(argString);
 
     _consumeSpaces(scanner);
-    if (scanner.isDone) scanner.error("Expected at least one argument.");
+    if (scanner.isDone) scanner.error('Expected at least one argument.');
 
-    var executable = _scanArg(scanner, glob: false)._plain;
+    final executable = _scanArg(scanner, glob: false)._plain;
     _consumeSpaces(scanner);
 
-    var args = <_Argument>[];
+    final args = <_Argument>[];
     while (!scanner.isDone) {
       args.add(_scanArg(scanner, glob: glob));
       _consumeSpaces(scanner);
@@ -58,6 +53,11 @@ class CliArguments {
   }
 
   CliArguments._(this.executable, this._arguments);
+  /// The executable to run.
+  final String executable;
+
+  /// The arguments to the executable, with globs not yet resolved.
+  final List<_Argument> _arguments;
 
   /// Consumes zero or more spaces.
   static void _consumeSpaces(StringScanner scanner) {
@@ -66,31 +66,31 @@ class CliArguments {
 
   /// Scans a single argument.
   static _Argument _scanArg(StringScanner scanner, {required bool glob}) {
-    var plainBuffer = StringBuffer();
-    var globBuffer = glob ? StringBuffer() : null;
+    final plainBuffer = StringBuffer();
+    final globBuffer = glob ? StringBuffer() : null;
     var isGlobActive = false;
     while (true) {
-      var next = scanner.peekChar();
+      final next = scanner.peekChar();
       if (next == $space || next == null) {
-        var glob = isGlobActive ? globBuffer?.toString() : null;
+        final glob = isGlobActive ? globBuffer?.toString() : null;
         return _Argument(plainBuffer.toString(), glob == null ? null : Glob(glob));
       } else if (next == $double_quote || next == $single_quote) {
         scanner.readChar();
 
-        var text = _scanUntil(scanner, next);
+        final text = _scanUntil(scanner, next);
         plainBuffer.write(text);
         globBuffer?.write(Glob.quote(text));
 
         scanner.readChar();
       } else if (next == $backslash) {
         scanner.readChar();
-        var char = scanner.readChar();
+        final char = scanner.readChar();
         plainBuffer.writeCharCode(char);
 
         globBuffer?.writeCharCode($backslash);
         globBuffer?.writeCharCode(char);
       } else {
-        var char = scanner.readChar();
+        final char = scanner.readChar();
         plainBuffer.writeCharCode(char);
         globBuffer?.writeCharCode(char);
         isGlobActive = glob &&
@@ -109,9 +109,9 @@ class CliArguments {
   /// Does not consume [endChar]. Throws a [FormatException] if the string ends
   /// before an [endChar] is found.
   static String _scanUntil(StringScanner scanner, int endChar) {
-    var buffer = StringBuffer();
+    final buffer = StringBuffer();
     while (true) {
-      var next = scanner.peekChar();
+      final next = scanner.peekChar();
       if (next == null) {
         scanner.expectChar(endChar);
       } else if (next == endChar) {
@@ -131,11 +131,13 @@ class CliArguments {
   /// paths (relative to [root], which defaults to the current directory) before
   /// being returned.
   Future<List<String>> arguments({String? root}) async =>
-      [for (var argument in _arguments) ...await argument.resolve(root: root)];
+      [for (final argument in _arguments) ...await argument.resolve(root: root)];
 }
 
 /// An argument parsed from a `executableAndArgs` string.
 class _Argument {
+
+  _Argument(this._plain, this._glob);
   /// The plain text of the argument, to be used if globbing is disabled or if
   /// [_glob] matches no files.
   final String _plain;
@@ -146,18 +148,16 @@ class _Argument {
   /// place of [_plain]. If it matches no files, [_plain] is used instead.
   final Glob? _glob;
 
-  _Argument(this._plain, this._glob);
-
   /// Returns the files matched by this argument's [Glob] if it has one and if
   /// it matches at least one file, or the plain argument string otherwise.
   ///
   /// The [root] is used as the root directory of the glob.
   Future<List<String>> resolve({String? root}) async {
-    var glob = _glob;
+    final glob = _glob;
     if (glob != null) {
-      var absolute = p.isAbsolute(glob.pattern);
-      var globbed = [
-        await for (var entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root)
+      final absolute = p.isAbsolute(glob.pattern);
+      final globbed = [
+        await for (final entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root)
       ];
       if (globbed.isNotEmpty) return globbed;
     }
@@ -166,16 +166,16 @@ class _Argument {
 }
 
 /// Converts [argument] to a string and escapes it so it's parsed as a single
-/// argument with no glob expansion by [new Script] and related functions.
+/// argument with no glob expansion by [Script] and related functions.
 ///
 /// For example, `run("cp -r ${arg(source)} build/")`.
 String arg(Object argument) {
-  var string = argument.toString();
+  final string = argument.toString();
   if (string.isEmpty) return '""';
 
-  var buffer = StringBuffer();
+  final buffer = StringBuffer();
   for (var i = 0; i < string.length; i++) {
-    var codeUnit = string.codeUnitAt(i);
+    final codeUnit = string.codeUnitAt(i);
     if (codeUnit == $space ||
         codeUnit == $double_quote ||
         codeUnit == $single_quote ||
@@ -197,8 +197,8 @@ String arg(Object argument) {
 }
 
 /// Converts all elements of [arguments] to strings and escapes them so they're
-/// parsed as separate arguments with no glob expansion by [new Script] and
+/// parsed as separate arguments with no glob expansion by [Script] and
 /// related functions.
 ///
 /// For example, `run("cp -r ${args(directories)} build/")`.
-String args(Iterable<Object> arguments) => arguments.map(arg).join(" ");
+String args(Iterable<Object> arguments) => arguments.map(arg).join(' ');
