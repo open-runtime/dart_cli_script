@@ -528,7 +528,7 @@ class Script {
   }
 
   late final Stream<List<int>> _stdout;
-  bool _stdoutAccessed = false;
+  var _stdoutAccessed = false;
 
   /// The script's standard error stream, typically used to emit error messages
   /// and diagnostics.
@@ -538,7 +538,7 @@ class Script {
   }
 
   late final Stream<List<int>> _stderr;
-  bool _stderrAccessed = false;
+  var _stderrAccessed = false;
 
   /// A controller for stderr produced by the [Script] infrastructure, merged
   /// with the stderr stream passed to [Script.fromComponents].

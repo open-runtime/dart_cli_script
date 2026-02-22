@@ -76,7 +76,7 @@ abstract class EventSinkBase<T> implements EventSink<T> {
 /// called or during a call to [onStream].
 abstract class StreamSinkBase<T> extends EventSinkBase<T> implements StreamSink<T> {
   /// Whether a call to [addStream] is ongoing.
-  bool _addingStream = false;
+  var _addingStream = false;
 
   @override
   Future<void> get done => _closeMemo.future;

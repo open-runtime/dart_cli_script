@@ -3,3 +3,18 @@ include: package:runtime_common_codestyle/recommended.yaml
 analyzer:
   errors:
     included_file_warning: ignore
+
+linter:
+  rules:
+    # Suppressed for forked third-party library — these patterns are intentional
+    discarded_futures: false
+    unnecessary_async: false
+    unawaited_futures: false
+    close_sinks: false
+    only_throw_errors: false
+    unnecessary_underscores: false
+    cascade_invocations: false
+    avoid_positional_boolean_parameters: false
+    avoid_futureor_void: false
+    avoid_catches_without_on_clauses: false
+    prefer_expression_function_bodies: false

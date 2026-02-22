@@ -260,7 +260,7 @@ void main() {
 /// The events collected by [collectEvents].
 class _CollectedEvents {
   final events = <Result<Object>>[];
-  bool done = false;
+  var done = false;
 
   /// Asserts that the event at [index] is a data event and returns its value.
   Object value(int index) => events[index].asValue!.value;
