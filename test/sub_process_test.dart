@@ -56,8 +56,10 @@ void main() {
   test('an error while spawning is printed to stderr', () {
     final script = Script('non-existent-executable');
     expect(script.exitCode, completion(equals(257)));
-    expect(script.stderr.lines,
-        emitsInOrder(['Error in non-existent-executable:', 'ProcessException: No such file or directory']));
+    expect(
+      script.stderr.lines,
+      emitsInOrder(['Error in non-existent-executable:', 'ProcessException: No such file or directory']),
+    );
   });
 
   group('stdin', () {
@@ -85,10 +87,12 @@ void main() {
     // [Stream.listen] until the file is actually open.
     test('that waits to listen', () async {
       await (mainScript("print('hello!');") >
-          FakeStreamConsumer(expectAsync1((stream) async {
-            await pumpEventQueue();
-            expect(stream.lines, emits('hello!'));
-          })));
+          FakeStreamConsumer(
+            expectAsync1((stream) async {
+              await pumpEventQueue();
+              expect(stream.lines, emits('hello!'));
+            }),
+          ));
     });
   });
 
@@ -118,8 +122,10 @@ void main() {
     test('the environment parameter overrides env', () {
       final varName = uid();
       env[varName] = 'outer value';
-      expect(_getSubprocessEnvironment(environment: {varName: 'inner value'}),
-          completion(containsPair(varName, 'inner value')));
+      expect(
+        _getSubprocessEnvironment(environment: {varName: 'inner value'}),
+        completion(containsPair(varName, 'inner value')),
+      );
     });
 
     group('with includeParentEnvironment: false', () {
@@ -135,8 +141,10 @@ void main() {
 
       test('uses the environment parameter', () {
         final varName = uid();
-        expect(_getSubprocessEnvironment(environment: {varName: 'value'}, includeParentEnvironment: false),
-            completion(containsPair(varName, 'value')));
+        expect(
+          _getSubprocessEnvironment(environment: {varName: 'value'}, includeParentEnvironment: false),
+          completion(containsPair(varName, 'value')),
+        );
       });
     });
   });
@@ -207,17 +215,25 @@ void stdoutOrStderr(String name, Stream<List<int>> Function(Script script) strea
       // We can't use expect(..., throwsStateError) here bceause of
       // dart-lang/sdk#45815.
       runZonedGuarded(
-          () => stream(script).listen(null), expectAsync2((error, stackTrace) => expect(error, isStateError)));
+        () => stream(script).listen(null),
+        expectAsync2((error, stackTrace) => expect(error, isStateError)),
+      );
     });
   });
 }
 
 /// Runs a Dart subprocess and returns the value of `Process.environment` in
 /// that subprocess.
-Future<Map<String, String>> _getSubprocessEnvironment(
-        {Map<String, String>? environment, bool includeParentEnvironment = true}) async =>
-    (json.decode(await mainScript('stdout.writeln(json.encode(Platform.environment));',
-                environment: environment, includeParentEnvironment: includeParentEnvironment)
-            .stdout
-            .text) as Map)
+Future<Map<String, String>> _getSubprocessEnvironment({
+  Map<String, String>? environment,
+  bool includeParentEnvironment = true,
+}) async =>
+    (json.decode(
+              await mainScript(
+                'stdout.writeln(json.encode(Platform.environment));',
+                environment: environment,
+                includeParentEnvironment: includeParentEnvironment,
+              ).stdout.text,
+            )
+            as Map)
         .cast<String, String>();

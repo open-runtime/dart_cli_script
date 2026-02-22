@@ -59,8 +59,11 @@ IOSink get currentStderr {
 T silenceStdout<T>(T Function() callback) {
   final group = StdioGroup();
   group.stream.drain<void>();
-  return runZoned(callback,
-      zoneValues: {stdoutKey: group}, zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}));
+  return runZoned(
+    callback,
+    zoneValues: {stdoutKey: group},
+    zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}),
+  );
 }
 
 /// Runs [callback] and silences all stderr emitted by [Script]s.
@@ -81,9 +84,11 @@ T silenceStderr<T>(T Function() callback) {
 T silenceOutput<T>(T Function() callback) {
   final group = StdioGroup();
   group.stream.drain<void>();
-  return runZoned(callback,
-      zoneValues: {stdoutKey: group, stderrKey: group},
-      zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}));
+  return runZoned(
+    callback,
+    zoneValues: {stdoutKey: group, stderrKey: group},
+    zoneSpecification: ZoneSpecification(print: (_, __, ___, ____) {}),
+  );
 }
 
 /// Runs [callback] in a [Script.capture] block and silences all stdout and
@@ -101,28 +106,40 @@ T silenceOutput<T>(T Function() callback) {
 /// callback allows capturing those signals so the callback may react
 /// appropriately. When no [onSignal] handler was set, calling [kill] will do
 /// nothing and return `false`.
-Script silenceUntilFailure(FutureOr<void> Function(Stream<List<int>> stdin) callback,
-    {String? name, bool? when, bool stderrOnly = false, bool Function(ProcessSignal signal)? onSignal}) {
+Script silenceUntilFailure(
+  FutureOr<void> Function(Stream<List<int>> stdin) callback, {
+  String? name,
+  bool? when,
+  bool stderrOnly = false,
+  bool Function(ProcessSignal signal)? onSignal,
+}) {
   // Wrap this in an additional [Script.capture] so that we can both handle the
   // failure *and* still have it be top-leveled if it's not handled by the
   // caller.
-  return Script.capture((stdin) async {
-    if (when == false) {
-      await callback(stdin);
-      return;
-    }
+  return Script.capture(
+    (stdin) async {
+      if (when == false) {
+        await callback(stdin);
+        return;
+      }
 
-    final script = BufferedScript.capture((_) => callback(stdin),
-        name: name == null ? null : '$name.inner', stderrOnly: stderrOnly);
+      final script = BufferedScript.capture(
+        (_) => callback(stdin),
+        name: name == null ? null : '$name.inner',
+        stderrOnly: stderrOnly,
+      );
 
-    try {
-      await script.done;
-    } catch (_) {
-      script.release();
+      try {
+        await script.done;
+      } catch (_) {
+        script.release();
 
-      // Give the new stdio a chance to propagate.
-      await Future<void>.delayed(Duration.zero);
-      rethrow;
-    }
-  }, name: name, onSignal: onSignal);
+        // Give the new stdio a chance to propagate.
+        await Future<void>.delayed(Duration.zero);
+        rethrow;
+      }
+    },
+    name: name,
+    onSignal: onSignal,
+  );
 }

@@ -70,10 +70,14 @@ String replaceMatch(Match match, String replacement) {
 extension UtilStreamExtensions<T> on Stream<T> {
   /// Returns a transformation of [this] that calls [callback] immediately
   /// before sending a `done` event to its listeners.
-  Stream<T> onDone(void Function() callback) => transform(StreamTransformer.fromHandlers(handleDone: (sink) {
+  Stream<T> onDone(void Function() callback) => transform(
+    StreamTransformer.fromHandlers(
+      handleDone: (sink) {
         callback();
         sink.close();
-      }));
+      },
+    ),
+  );
 
   /// Returns a transformation of [this] that only emits error and done events,
   /// not data events.

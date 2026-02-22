@@ -31,19 +31,23 @@ void main() {
       expect(env, containsPair(varName, 'value'));
     });
 
-    group('with a non-empty environment', () {
-      test('can override existing variables', () {
-        final varName = Platform.environment.keys.first;
-        env[varName] = 'new special fancy value';
-        expect(env, containsPair(varName, 'new special fancy value'));
-      });
+    group(
+      'with a non-empty environment',
+      () {
+        test('can override existing variables', () {
+          final varName = Platform.environment.keys.first;
+          env[varName] = 'new special fancy value';
+          expect(env, containsPair(varName, 'new special fancy value'));
+        });
 
-      test('can remove existing variables', () {
-        final varName = Platform.environment.keys.last;
-        env.remove(varName);
-        expect(env, isNot(contains(varName)));
-      });
-    }, skip: Platform.environment.isEmpty ? 'These tests require at least one environment variable to be set' : null);
+        test('can remove existing variables', () {
+          final varName = Platform.environment.keys.last;
+          env.remove(varName);
+          expect(env, isNot(contains(varName)));
+        });
+      },
+      skip: Platform.environment.isEmpty ? 'These tests require at least one environment variable to be set' : null,
+    );
   });
 
   group('withEnv', () {
@@ -59,10 +63,13 @@ void main() {
 
       test("inner modifications don't modify the outer environment", () {
         final varName = uid();
-        withEnv(expectAsync0(() {
-          env[varName] = 'value';
-          expect(env, containsPair(varName, 'value'));
-        }), {});
+        withEnv(
+          expectAsync0(() {
+            env[varName] = 'value';
+            expect(env, containsPair(varName, 'value'));
+          }),
+          {},
+        );
         expect(env, isNot(contains(varName)));
       });
 
@@ -109,8 +116,9 @@ void main() {
       final varName = uid();
       env[varName] = 'outer value';
       env.remove(varName.toUpperCase());
-      withEnv(expectAsync0(() => expect(env, containsPair(varName, 'inner value'))),
-          {varName.toUpperCase(): 'inner value'});
+      withEnv(expectAsync0(() => expect(env, containsPair(varName, 'inner value'))), {
+        varName.toUpperCase(): 'inner value',
+      });
     });
   }, testOn: 'windows');
 }

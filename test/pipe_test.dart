@@ -23,7 +23,8 @@ import 'util.dart';
 
 void main() {
   test("pipes one script's stdout into another's stdin", () {
-    final pipeline = mainScript('print("hello!");') |
+    final pipeline =
+        mainScript('print("hello!");') |
         Script.capture((stdin) async {
           await expectLater(stdin.lines, emits('hello!'));
         });
@@ -48,14 +49,15 @@ void main() {
         mainScript('print("a: " + stdin.readLineSync()!);'),
         mainScript('print("b: " + stdin.readLineSync()!);'),
         mainScript('print("c: " + stdin.readLineSync()!);'),
-        mainScript('print("d: " + stdin.readLineSync()!);')
+        mainScript('print("d: " + stdin.readLineSync()!);'),
       ]);
       pipeline.stdin.writeln('hello!');
       expect(pipeline.stdout.lines, emits('d: c: b: a: hello!'));
     });
 
     test('with repeated |', () {
-      final pipeline = mainScript('print("a: " + stdin.readLineSync()!);') |
+      final pipeline =
+          mainScript('print("a: " + stdin.readLineSync()!);') |
           mainScript('print("b: " + stdin.readLineSync()!);') |
           mainScript('print("c: " + stdin.readLineSync()!);') |
           mainScript('print("d: " + stdin.readLineSync()!);');
@@ -131,7 +133,8 @@ void main() {
           test('and the second fails', () async {
             final completer = Completer<void>();
             final script1 = mainScript('');
-            final pipeline = script1 |
+            final pipeline =
+                script1 |
                 Script.capture((_) async {
                   await completer.future;
                   throw 'oh no';
@@ -196,8 +199,7 @@ void main() {
         });
       });
 
-      group(
-          "the error isn't top-leveled if it's handled only at the pipeline "
+      group("the error isn't top-leveled if it's handled only at the pipeline "
           'level', () {
         test('if the first fails', () async {
           final pipeline = mainScript('exitCode = 1;') | mainScript('');
@@ -222,7 +224,8 @@ void main() {
         test('if the first exits first', () async {
           final completer = Completer<void>();
           final script1 = mainScript('exitCode = 123;');
-          final pipeline = script1 |
+          final pipeline =
+              script1 |
               Script.capture((_) async {
                 await completer.future;
                 throw 'oh no';
@@ -268,8 +271,7 @@ void main() {
         });
       });
 
-      test(
-          "the error isn't top-leveled if it's handled only at the pipeline "
+      test("the error isn't top-leveled if it's handled only at the pipeline "
           'level', () async {
         final pipeline = mainScript('exitCode = 1;') | mainScript('exitCode = 2;');
         expect(await pipeline.exitCode, equals(2));
@@ -283,7 +285,8 @@ void main() {
   group('pipes in', () {
     group('a byte stream', () {
       test('without errors', () {
-        final pipeline = Stream<List<int>>.fromIterable([utf8.encode('foo'), utf8.encode('bar')]) |
+        final pipeline =
+            Stream<List<int>>.fromIterable([utf8.encode('foo'), utf8.encode('bar')]) |
             mainScript('stdin.pipe(stdout);');
         expect(pipeline.stdout.lines, emitsInOrder(['foobar', emitsDone]));
       });

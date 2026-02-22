@@ -29,12 +29,12 @@ import 'util/sink_base.dart';
 /// the same purpose but is unaffected by [sink] being closed or locked by
 /// [Sink.addStream].
 class StdioGroup {
-
   StdioGroup() : this._(StreamController(sync: true));
 
   StdioGroup._(this._sinkController) : sink = _StdioGroupSink(_sinkController.sink) {
     _group.add(_sinkController.stream);
   }
+
   /// The inner stream group that handles all the heavy lifting of merging
   /// streams.
   final _group = StreamGroup<List<int>>();
@@ -73,10 +73,10 @@ class StdioGroup {
 /// A custom [IOSink] that doesn't actually close the underlying sink when it's
 /// closed.
 class _StdioGroupSink extends IOSinkBase implements IOSink {
-
   _StdioGroupSink(this._sink) {
     encoding = utf8;
   }
+
   /// The underlying sink.
   final StreamSink<List<int>> _sink;
 

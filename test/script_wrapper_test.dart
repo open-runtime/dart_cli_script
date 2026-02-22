@@ -36,9 +36,13 @@ void main() {
     });
 
     test('surfaces an error as a Script error', () {
-      final script = Script.fromByteTransformer(StreamTransformer.fromHandlers(handleData: (_, sink) {
-        sink.addError('oh no!');
-      }));
+      final script = Script.fromByteTransformer(
+        StreamTransformer.fromHandlers(
+          handleData: (_, sink) {
+            sink.addError('oh no!');
+          },
+        ),
+      );
       script.stdin.add([1, 2, 3]);
       expect(script.stderr.lines, emitsThrough(contains('oh no!')));
       expect(script.exitCode, completion(equals(257)));
@@ -47,7 +51,8 @@ void main() {
 
   group('Script.fromStringTransformer()', () {
     final transformer = StreamTransformer<String, String>.fromBind(
-        (stream) => stream.map((string) => String.fromCharCodes(string.runes.toList().reversed)));
+      (stream) => stream.map((string) => String.fromCharCodes(string.runes.toList().reversed)),
+    );
 
     test('converts data from stdin', () {
       final script = Script.fromLineTransformer(transformer);
@@ -63,9 +68,13 @@ void main() {
     });
 
     test('surfaces an error as a Script error', () {
-      final script = Script.fromByteTransformer(StreamTransformer.fromHandlers(handleData: (_, sink) {
-        sink.addError('oh no!');
-      }));
+      final script = Script.fromByteTransformer(
+        StreamTransformer.fromHandlers(
+          handleData: (_, sink) {
+            sink.addError('oh no!');
+          },
+        ),
+      );
       script.stdin.writeln('hello!');
       expect(script.stderr.lines, emitsThrough(contains('oh no!')));
       expect(script.exitCode, completion(equals(257)));

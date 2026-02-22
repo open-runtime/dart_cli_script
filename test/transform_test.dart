@@ -113,8 +113,10 @@ void main() {
     });
 
     test("sourcePath and sourceUrl can't both be set", () async {
-      expect(() => Stream.fromIterable(['foo', 'bar', 'baz']).withSpans(sourceUrl: Uri.parse('foo'), sourcePath: 'foo'),
-          throwsArgumentError);
+      expect(
+        () => Stream.fromIterable(['foo', 'bar', 'baz']).withSpans(sourceUrl: Uri.parse('foo'), sourcePath: 'foo'),
+        throwsArgumentError,
+      );
     });
   });
 
@@ -129,8 +131,10 @@ void main() {
 
     group('with onlyMatching: true', () {
       test('throws an error if exclude is also true', () {
-        expect(() => Stream.fromIterable(['foo', 'bar', 'baz']).grep('^b', onlyMatching: true, exclude: true),
-            throwsArgumentError);
+        expect(
+          () => Stream.fromIterable(['foo', 'bar', 'baz']).grep('^b', onlyMatching: true, exclude: true),
+          throwsArgumentError,
+        );
       });
 
       test('prints the matching parts of lines that match', () {
@@ -138,8 +142,10 @@ void main() {
       });
 
       test('prints multiple matching parts per line', () {
-        expect(Stream.fromIterable(['foo bar', 'baz bang bop']).grep('[a-z]{3}', onlyMatching: true),
-            emitsInOrder(['foo', 'bar', 'baz', 'ban', 'bop']));
+        expect(
+          Stream.fromIterable(['foo bar', 'baz bang bop']).grep('[a-z]{3}', onlyMatching: true),
+          emitsInOrder(['foo', 'bar', 'baz', 'ban', 'bop']),
+        );
       });
 
       test("doesn't print empty matches", () {
@@ -163,8 +169,11 @@ void main() {
 
       group('with onlyMatching: true', () {
         test('emits the matching parts of spans that match', () async {
-          final tuples =
-              await Stream.fromIterable(['foo', 'bar', 'baz']).withSpans().grep('a.', onlyMatching: true).toList();
+          final tuples = await Stream.fromIterable([
+            'foo',
+            'bar',
+            'baz',
+          ]).withSpans().grep('a.', onlyMatching: true).toList();
 
           expect(tuples, hasLength(2));
           expect(tuples[0].item2.text, equals('ar'));
@@ -172,8 +181,11 @@ void main() {
         });
 
         test('preserves the context of spans that match', () async {
-          final tuples =
-              await Stream.fromIterable(['foo', 'bar', 'baz']).withSpans().grep('a.', onlyMatching: true).toList();
+          final tuples = await Stream.fromIterable([
+            'foo',
+            'bar',
+            'baz',
+          ]).withSpans().grep('a.', onlyMatching: true).toList();
 
           expect(tuples, hasLength(2));
           expect(tuples[0].item2.context, equals('bar'));
@@ -181,10 +193,10 @@ void main() {
         });
 
         test('emits the matching parts of multiple matches per line', () async {
-          final tuples = await Stream.fromIterable(['foo bar', 'baz bang bop'])
-              .withSpans()
-              .grep('[a-z]{3}', onlyMatching: true)
-              .toList();
+          final tuples = await Stream.fromIterable([
+            'foo bar',
+            'baz bang bop',
+          ]).withSpans().grep('[a-z]{3}', onlyMatching: true).toList();
 
           expect(tuples, hasLength(5));
           expect(tuples[0].item2.text, equals('foo'));
@@ -195,10 +207,10 @@ void main() {
         });
 
         test('preserves the context of multiple matches per line', () async {
-          final tuples = await Stream.fromIterable(['foo bar', 'baz bang bop'])
-              .withSpans()
-              .grep('[a-z]{3}', onlyMatching: true)
-              .toList();
+          final tuples = await Stream.fromIterable([
+            'foo bar',
+            'baz bang bop',
+          ]).withSpans().grep('[a-z]{3}', onlyMatching: true).toList();
 
           expect(tuples, hasLength(5));
           expect(tuples[0].item2.context, equals('foo bar'));
@@ -213,52 +225,68 @@ void main() {
 
   group('replaceMapped', () {
     test('replaces the first match', () {
-      expect(Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replaceMapped('b(.)', (match) => '${match[1]!}q'),
-          emitsInOrder(['foo', 'aqr baz', 'oqz bop', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replaceMapped('b(.)', (match) => '${match[1]!}q'),
+        emitsInOrder(['foo', 'aqr baz', 'oqz bop', emitsDone]),
+      );
     });
 
     test('replaces all matches with all: true', () {
       expect(
-          Stream.fromIterable(['foo', 'bar baz', 'boz bop'])
-              .replaceMapped('b(.)', (match) => '${match[1]!}q', all: true),
-          emitsInOrder(['foo', 'aqr aqz', 'oqz oqp', emitsDone]));
+        Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replaceMapped('b(.)', (match) => '${match[1]!}q', all: true),
+        emitsInOrder(['foo', 'aqr aqz', 'oqz oqp', emitsDone]),
+      );
     });
   });
 
   group('replace', () {
     test('replaces the first match', () {
-      expect(Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replace('b(.)', r'\1q'),
-          emitsInOrder(['foo', 'aqr baz', 'oqz bop', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replace('b(.)', r'\1q'),
+        emitsInOrder(['foo', 'aqr baz', 'oqz bop', emitsDone]),
+      );
     });
 
     test('replaces all matches with all: true', () {
-      expect(Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replace('b(.)', r'\1q', all: true),
-          emitsInOrder(['foo', 'aqr aqz', 'oqz oqp', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar baz', 'boz bop']).replace('b(.)', r'\1q', all: true),
+        emitsInOrder(['foo', 'aqr aqz', 'oqz oqp', emitsDone]),
+      );
     });
 
     test('converts double backslash to single', () {
-      expect(Stream.fromIterable(['foo', 'bar', 'boz']).replace('b(.)', r'\\q'),
-          emitsInOrder(['foo', r'\qr', r'\qz', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar', 'boz']).replace('b(.)', r'\\q'),
+        emitsInOrder(['foo', r'\qr', r'\qz', emitsDone]),
+      );
     });
 
     test('ignores other backslash', () {
-      expect(Stream.fromIterable(['foo', 'bar', 'boz']).replace('b(.)', r'\q'),
-          emitsInOrder(['foo', 'qr', 'qz', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar', 'boz']).replace('b(.)', r'\q'),
+        emitsInOrder(['foo', 'qr', 'qz', emitsDone]),
+      );
     });
 
     test('allows trailing backslash', () {
-      expect(Stream.fromIterable(['foo', 'bar', 'boz']).replace('b(.)', r'q\'),
-          emitsInOrder(['foo', 'qr', 'qz', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar', 'boz']).replace('b(.)', r'q\'),
+        emitsInOrder(['foo', 'qr', 'qz', emitsDone]),
+      );
     });
 
     test('allows references to unmatched groups', () {
-      expect(Stream.fromIterable(['foo', 'bar', 'boz']).replace('(zink)|(bar)', r'\1'),
-          emitsInOrder(['foo', '', 'boz', emitsDone]));
+      expect(
+        Stream.fromIterable(['foo', 'bar', 'boz']).replace('(zink)|(bar)', r'\1'),
+        emitsInOrder(['foo', '', 'boz', emitsDone]),
+      );
     });
 
     test('forbids references to non-existent groups', () {
-      expect(Stream.fromIterable(['foo', 'bar', 'boz']).replace('(zink)|(bar)', r'\3'),
-          emitsInOrder(['foo', emitsError(isFormatException)]));
+      expect(
+        Stream.fromIterable(['foo', 'bar', 'boz']).replace('(zink)|(bar)', r'\3'),
+        emitsInOrder(['foo', emitsError(isFormatException)]),
+      );
     });
   });
 
@@ -278,23 +306,26 @@ void main() {
   group('xargs', () {
     group('from a stream', () {
       test('passes stream entries as arguments', () {
-        final script = Stream.fromIterable(['foo', 'bar\nbaz'])
-            .xargs(expectAsync1((args) => expect(args, equals(['foo', 'bar\nbaz']))));
+        final script = Stream.fromIterable([
+          'foo',
+          'bar\nbaz',
+        ]).xargs(expectAsync1((args) => expect(args, equals(['foo', 'bar\nbaz']))));
         expect(script.done, completes);
       });
 
       test('only passes maxArgs per callback', () {
         var count = 0;
         final script = Stream.fromIterable(['1', '2', '3', '4', '5']).xargs(
-            expectAsync1((args) {
-              if (count == 0) {
-                expect(args, equals(['1', '2', '3']));
-              } else {
-                expect(args, equals(['4', '5']));
-              }
-              count++;
-            }, count: 2),
-            maxArgs: 3);
+          expectAsync1((args) {
+            if (count == 0) {
+              expect(args, equals(['1', '2', '3']));
+            } else {
+              expect(args, equals(['4', '5']));
+            }
+            count++;
+          }, count: 2),
+          maxArgs: 3,
+        );
         expect(script.done, completes);
       });
 
@@ -302,11 +333,12 @@ void main() {
         var count = 0;
         final completer = Completer<void>();
         final script = Stream.fromIterable(['1', '2']).xargs(
-            expectAsync1((args) {
-              count++;
-              return completer.future;
-            }, count: 2),
-            maxArgs: 1);
+          expectAsync1((args) {
+            count++;
+            return completer.future;
+          }, count: 2),
+          maxArgs: 1,
+        );
         expect(script.done, completes);
 
         await pumpEventQueue();
@@ -320,8 +352,13 @@ void main() {
       test("the script doesn't complete until the callbacks are finished", () async {
         var count = 0;
         final completers = List.generate(5, (_) => Completer<void>());
-        final script = Stream.fromIterable(['1', '2', '3', '4', '5'])
-            .xargs(expectAsync1((args) => completers[count++].future, count: 5), maxArgs: 1);
+        final script = Stream.fromIterable([
+          '1',
+          '2',
+          '3',
+          '4',
+          '5',
+        ]).xargs(expectAsync1((args) => completers[count++].future, count: 5), maxArgs: 1);
 
         var done = false;
         script.done.then((_) {
@@ -341,8 +378,13 @@ void main() {
       test("the script doesn't complete until the callbacks are finished", () async {
         var count = 0;
         final completers = List.generate(5, (_) => Completer<void>());
-        final script = Stream.fromIterable(['1', '2', '3', '4', '5'])
-            .xargs(expectAsync1((args) => completers[count++].future, count: 5), maxArgs: 1);
+        final script = Stream.fromIterable([
+          '1',
+          '2',
+          '3',
+          '4',
+          '5',
+        ]).xargs(expectAsync1((args) => completers[count++].future, count: 5), maxArgs: 1);
 
         var done = false;
         script.done.then((_) {
@@ -368,8 +410,7 @@ void main() {
         expect(script.done, throwsScriptException(257));
       });
 
-      test(
-          'the script fails preserving the exit code '
+      test('the script fails preserving the exit code '
           'if the stream throws a ScriptException', () async {
         final controller = StreamController<String>();
         final script = controller.stream.xargs(print);
@@ -380,8 +421,13 @@ void main() {
       });
 
       test('the script fails once a callback throws', () async {
-        final script = Stream.fromIterable(['1', '2', '3', '4', '5'])
-            .xargs(expectAsync1((args) => throw 'oh no'), maxArgs: 1);
+        final script = Stream.fromIterable([
+          '1',
+          '2',
+          '3',
+          '4',
+          '5',
+        ]).xargs(expectAsync1((args) => throw 'oh no'), maxArgs: 1);
         script.stderr.drain<void>();
         expect(script.exitCode, completion(equals(257)));
 
@@ -392,7 +438,8 @@ void main() {
 
     group('as a script', () {
       test('converts each line of stdin into an argument', () {
-        final script = Script.capture((_) {
+        final script =
+            Script.capture((_) {
               print('foo bar');
               print('baz\nbang');
             }) |

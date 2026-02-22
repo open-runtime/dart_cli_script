@@ -61,8 +61,12 @@ T withTempPath<T>(T Function(String path) callback, {String? prefix, String? suf
 /// Note that even [withTempPath] can safely be used with an asynchronous
 /// [callback]. This function is only necessary if you need the automatic
 /// filesystem operations to be asynchronous.
-Future<T> withTempPathAsync<T>(FutureOr<T> Function(String path) callback,
-    {String? prefix, String? suffix, String? parent}) async {
+Future<T> withTempPathAsync<T>(
+  FutureOr<T> Function(String path) callback, {
+  String? prefix,
+  String? suffix,
+  String? parent,
+}) async {
   final path = _tempPathName(prefix, suffix, parent);
   try {
     return await callback(path);
@@ -88,10 +92,15 @@ Future<T> withTempPathAsync<T>(FutureOr<T> Function(String path) callback,
 /// directory's basename. If [suffix] is passed, it's added to the end. If
 /// [parent] is passed, the temporary directory is created within that path;
 /// otherwise, it's created within [Directory.systemTemp].
-T withTempDir<T>(T Function(String dir) callback, {String? prefix, String? suffix, String? parent}) => withTempPath((path) {
-      Directory(path).createSync();
-      return callback(path);
-    }, prefix: prefix, suffix: suffix, parent: parent);
+T withTempDir<T>(T Function(String dir) callback, {String? prefix, String? suffix, String? parent}) => withTempPath(
+  (path) {
+    Directory(path).createSync();
+    return callback(path);
+  },
+  prefix: prefix,
+  suffix: suffix,
+  parent: parent,
+);
 
 /// Like [withTempDir], but creates and deletes the temporary directory
 /// asynchronously.
@@ -99,11 +108,20 @@ T withTempDir<T>(T Function(String dir) callback, {String? prefix, String? suffi
 /// Note that even [withTempDir] can safely be used with an asynchronous
 /// [callback]. This function is only necessary if you need the automatic
 /// filesystem operations to be asynchronous.
-Future<T> withTempDirAsync<T>(FutureOr<T> Function(String dir) callback, {String? prefix, String? suffix, String? parent}) =>
-    withTempPathAsync((path) async {
-      await Directory(path).create();
-      return await callback(path);
-    }, prefix: prefix, suffix: suffix, parent: parent);
+Future<T> withTempDirAsync<T>(
+  FutureOr<T> Function(String dir) callback, {
+  String? prefix,
+  String? suffix,
+  String? parent,
+}) => withTempPathAsync(
+  (path) async {
+    await Directory(path).create();
+    return await callback(path);
+  },
+  prefix: prefix,
+  suffix: suffix,
+  parent: parent,
+);
 
 /// Returns the name of a temporary path within [parent] with the given [prefix]
 /// and [suffix].

@@ -38,12 +38,14 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [RegExp.new].
-  Stream<Tuple2<String, SourceSpanWithContext>> grep(String regexp,
-      {bool exclude = false,
-      bool onlyMatching = false,
-      bool caseSensitive = true,
-      bool unicode = false,
-      bool dotAll = false}) {
+  Stream<Tuple2<String, SourceSpanWithContext>> grep(
+    String regexp, {
+    bool exclude = false,
+    bool onlyMatching = false,
+    bool caseSensitive = true,
+    bool unicode = false,
+    bool dotAll = false,
+  }) {
     if (exclude && onlyMatching) {
       throw ArgumentError("The exclude and onlyMatching flags can't both be set");
     }
@@ -51,10 +53,12 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
     final pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
 
     return onlyMatching
-        ? expand((tuple) => pattern
-            .allMatches(tuple.item1)
-            .map((match) => Tuple2(match.group(0)!, tuple.item2.subspan(match.start, match.end)))
-            .where((tuple) => tuple.item1.isNotEmpty))
+        ? expand(
+            (tuple) => pattern
+                .allMatches(tuple.item1)
+                .map((match) => Tuple2(match.group(0)!, tuple.item2.subspan(match.start, match.end)))
+                .where((tuple) => tuple.item1.isNotEmpty),
+          )
         : where((tuple) => pattern.hasMatch(tuple.item1) != exclude);
   }
 
@@ -69,10 +73,21 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [RegExp.new].
-  Stream<Tuple2<String, SourceSpanWithContext>> replace(String regexp, String replacement,
-          {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
-      replaceMapped(regexp, (match) => replaceMatch(match, replacement),
-          all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
+  Stream<Tuple2<String, SourceSpanWithContext>> replace(
+    String regexp,
+    String replacement, {
+    bool all = false,
+    bool caseSensitive = true,
+    bool unicode = false,
+    bool dotAll = false,
+  }) => replaceMapped(
+    regexp,
+    (match) => replaceMatch(match, replacement),
+    all: all,
+    caseSensitive: caseSensitive,
+    unicode: unicode,
+    dotAll: dotAll,
+  );
 
   /// Replaces matches of [regexp] with the result of calling [replace].
   ///
@@ -81,11 +96,18 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   ///
   /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
   /// [RegExp.new].
-  Stream<Tuple2<String, SourceSpanWithContext>> replaceMapped(String regexp, String Function(Match match) replace,
-      {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) {
+  Stream<Tuple2<String, SourceSpanWithContext>> replaceMapped(
+    String regexp,
+    String Function(Match match) replace, {
+    bool all = false,
+    bool caseSensitive = true,
+    bool unicode = false,
+    bool dotAll = false,
+  }) {
     final pattern = RegExp(regexp, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll);
     return mapLines(
-        (line) => all ? line.replaceAllMapped(pattern, replace) : line.replaceFirstMapped(pattern, replace));
+      (line) => all ? line.replaceAllMapped(pattern, replace) : line.replaceFirstMapped(pattern, replace),
+    );
   }
 
   /// Returns a stream that emits the same events as this one, but also prints
@@ -93,9 +115,9 @@ extension LineAndSpanStreamExtensions on Stream<Tuple2<String, SourceSpanWithCon
   ///
   /// This is primarily intended for debugging.
   Stream<Tuple2<String, SourceSpanWithContext>> get teeToStderr => mapLines((line) {
-        currentStderr.writeln(line);
-        return line;
-      });
+    currentStderr.writeln(line);
+    return line;
+  });
 
   /// Like [Stream.map], but only applies the callback to the lines and not the
   /// spans.

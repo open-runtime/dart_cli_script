@@ -40,7 +40,6 @@ import 'util/entangled_controllers.dart';
 /// running, or only if they fail.
 @sealed
 class BufferedScript extends Script {
-
   /// Like [Script.capture], but all output is silently buffered until [release]
   /// is called.
   ///
@@ -51,8 +50,12 @@ class BufferedScript extends Script {
   /// callback allows capturing those signals so the callback may react
   /// appropriately. When no [onSignal] handler was set, calling [kill] will do
   /// nothing and return `false`.
-  factory BufferedScript.capture(FutureOr<void> Function(Stream<List<int>> stdin) callback,
-      {String? name, bool Function(ProcessSignal signal)? onSignal, bool stderrOnly = false}) {
+  factory BufferedScript.capture(
+    FutureOr<void> Function(Stream<List<int>> stdin) callback, {
+    String? name,
+    bool Function(ProcessSignal signal)? onSignal,
+    bool stderrOnly = false,
+  }) {
     final inner = Script.capture(callback, name: name ?? 'BufferedScript.capture', onSignal: onSignal);
 
     if (stderrOnly) {
@@ -67,13 +70,18 @@ class BufferedScript extends Script {
   /// [_stdoutBuffer] and [_stderrBuffer] from a single call to
   /// [createEntangledControllers].
   BufferedScript._(Script script, this._stdoutBuffer, this._stderrBuffer)
-      : _stdoutCompleter = _stdoutBuffer == null ? null : StreamCompleter<List<int>>(),
-        super.fromComponentsInternal(
-            script.name,
-            () => ScriptComponents(
-                script.stdin, _stdoutBuffer == null ? script.stdout : const Stream.empty(), const Stream.empty(), script.exitCode),
-            script.kill,
-            silenceStartMessage: true) {
+    : _stdoutCompleter = _stdoutBuffer == null ? null : StreamCompleter<List<int>>(),
+      super.fromComponentsInternal(
+        script.name,
+        () => ScriptComponents(
+          script.stdin,
+          _stdoutBuffer == null ? script.stdout : const Stream.empty(),
+          const Stream.empty(),
+          script.exitCode,
+        ),
+        script.kill,
+        silenceStartMessage: true,
+      ) {
     final stdoutBuffer = _stdoutBuffer;
     if (stdoutBuffer != null) script.stdout.pipe(stdoutBuffer);
     script.stderr.pipe(_stderrBuffer);
@@ -137,14 +145,14 @@ class BufferedScript extends Script {
   /// However, unlike [done], the returned future will *not* emit an error even
   /// if the script fails.
   Future<void> release() => _releaseMemo.runOnce(() async {
-        _stdoutCompleter?.setSourceStream(_stdoutBuffer!.stream);
-        _stderrCompleter.setSourceStream(_stderrBuffer.stream);
+    _stdoutCompleter?.setSourceStream(_stdoutBuffer!.stream);
+    _stderrCompleter.setSourceStream(_stderrBuffer.stream);
 
-        final stdoutBuffer = _stdoutBuffer;
-        await Future.wait([if (stdoutBuffer != null) stdoutBuffer.done, _stderrBuffer.done]);
+    final stdoutBuffer = _stdoutBuffer;
+    await Future.wait([if (stdoutBuffer != null) stdoutBuffer.done, _stderrBuffer.done]);
 
-        // Give outer stdio listeners a chance to handle the IO.
-        await Future<void>.delayed(Duration.zero);
-      });
+    // Give outer stdio listeners a chance to handle the IO.
+    await Future<void>.delayed(Duration.zero);
+  });
   final _releaseMemo = AsyncMemoizer<void>();
 }

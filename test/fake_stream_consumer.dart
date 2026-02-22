@@ -16,7 +16,6 @@ import 'dart:async';
 
 /// A [StreamConsumer] whose implementation just comes from a callback.
 class FakeStreamConsumer<T> implements StreamConsumer<T> {
-
   FakeStreamConsumer(this._implementation);
   final Future<void> Function(Stream<T> stream) _implementation;
 

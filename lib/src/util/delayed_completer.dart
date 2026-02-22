@@ -21,11 +21,11 @@ import 'package:meta/meta.dart';
 /// [ready] is called.
 @sealed
 class DelayedCompleter<T> implements Completer<T> {
-
   DelayedCompleter() : _inner = Completer<T>();
 
   /// Like [Completer.sync].
   DelayedCompleter.sync() : _inner = Completer<T>.sync();
+
   /// Whether [ready] has been called.
   bool get isReady => _ready;
   var _ready = false;

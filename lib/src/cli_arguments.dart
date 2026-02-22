@@ -22,7 +22,6 @@ import 'package:string_scanner/string_scanner.dart';
 
 /// CLI arguments parsed from a `executableAndArgs` string.
 class CliArguments {
-
   /// Parses [argString], a shell-style string of space-separated arguments,
   /// into a list of separate arguments.
   ///
@@ -53,6 +52,7 @@ class CliArguments {
   }
 
   CliArguments._(this.executable, this._arguments);
+
   /// The executable to run.
   final String executable;
 
@@ -93,7 +93,8 @@ class CliArguments {
         final char = scanner.readChar();
         plainBuffer.writeCharCode(char);
         globBuffer?.writeCharCode(char);
-        isGlobActive = glob &&
+        isGlobActive =
+            glob &&
             (isGlobActive ||
                 char == $asterisk ||
                 char == $question ||
@@ -130,14 +131,15 @@ class CliArguments {
   /// If the arguments include [Glob]s, they will be resolved to concrete file
   /// paths (relative to [root], which defaults to the current directory) before
   /// being returned.
-  Future<List<String>> arguments({String? root}) async =>
-      [for (final argument in _arguments) ...await argument.resolve(root: root)];
+  Future<List<String>> arguments({String? root}) async => [
+    for (final argument in _arguments) ...await argument.resolve(root: root),
+  ];
 }
 
 /// An argument parsed from a `executableAndArgs` string.
 class _Argument {
-
   _Argument(this._plain, this._glob);
+
   /// The plain text of the argument, to be used if globbing is disabled or if
   /// [_glob] matches no files.
   final String _plain;
@@ -157,7 +159,7 @@ class _Argument {
     if (glob != null) {
       final absolute = p.isAbsolute(glob.pattern);
       final globbed = [
-        await for (final entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root)
+        await for (final entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root),
       ];
       if (globbed.isNotEmpty) return globbed;
     }

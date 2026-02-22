@@ -30,26 +30,44 @@ void main() {
   group('with no events buffered', () {
     group('both streams emit no events', () {
       test('when listened in the same microtask', () {
-        controller1.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
-        controller2.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
+        controller1.stream.listen(
+          expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0),
+          onDone: expectAsync0(() {}, count: 0),
+        );
+        controller2.stream.listen(
+          expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0),
+          onDone: expectAsync0(() {}, count: 0),
+        );
       });
 
       test('when listened in separate microtasks', () async {
-        controller1.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
+        controller1.stream.listen(
+          expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0),
+          onDone: expectAsync0(() {}, count: 0),
+        );
         await Future<void>.value();
-        controller2.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
+        controller2.stream.listen(
+          expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0),
+          onDone: expectAsync0(() {}, count: 0),
+        );
       });
 
       test('when listened in distant microtasks', () async {
-        controller1.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
+        controller1.stream.listen(
+          expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0),
+          onDone: expectAsync0(() {}, count: 0),
+        );
         await pumpEventQueue();
-        controller2.stream.listen(expectAsync1((_) {}, count: 0),
-            onError: expectAsync2((_, __) {}, count: 0), onDone: expectAsync0(() {}, count: 0));
+        controller2.stream.listen(
+          expectAsync1((_) {}, count: 0),
+          onError: expectAsync2((_, __) {}, count: 0),
+          onDone: expectAsync0(() {}, count: 0),
+        );
       });
     });
 
@@ -270,7 +288,9 @@ _CollectedEvents _collectEventsFromBoth(StreamController<Object> controller1, St
 
 /// Listens to [controller]'s stream and adds all events it emits to [events].
 void _collectEventsInto(StreamController<Object> controller, _CollectedEvents events) {
-  controller.stream.listen((value) => events.events.add(Result.value(value)),
-      onError: (Object error, StackTrace stackTrace) => events.events.add(Result.error(error, stackTrace)),
-      onDone: () => events.done = true);
+  controller.stream.listen(
+    (value) => events.events.add(Result.value(value)),
+    onError: (Object error, StackTrace stackTrace) => events.events.add(Result.error(error, stackTrace)),
+    onDone: () => events.done = true,
+  );
 }

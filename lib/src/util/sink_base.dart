@@ -87,10 +87,14 @@ abstract class StreamSinkBase<T> extends EventSinkBase<T> implements StreamSink<
 
     _addingStream = true;
     final completer = Completer<void>.sync();
-    stream.listen(onAdd, onError: onError, onDone: () {
-      _addingStream = false;
-      completer.complete();
-    });
+    stream.listen(
+      onAdd,
+      onError: onError,
+      onDone: () {
+        _addingStream = false;
+        completer.complete();
+      },
+    );
     return completer.future;
   }
 
@@ -113,8 +117,8 @@ abstract class StreamSinkBase<T> extends EventSinkBase<T> implements StreamSink<
 /// This takes care of ensuring that events can't be added after [close] is
 /// called or during a call to [onStream].
 abstract class IOSinkBase extends StreamSinkBase<List<int>> implements IOSink {
-
   IOSinkBase([this.encoding = utf8]);
+
   /// See [IOSink.encoding] from `dart:io`.
   @override
   Encoding encoding;

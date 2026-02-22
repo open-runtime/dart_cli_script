@@ -44,13 +44,11 @@ Tuple2<StreamController<T>, StreamController<T>> createEntangledControllers<T>()
 /// Once either one is listened to, the controllers' internal buffers are used
 /// instead.
 class _EntangledBuffer<T> {
-
-  _EntangledBuffer()
-      : controller1 = StreamController(sync: true),
-        controller2 = StreamController(sync: true) {
+  _EntangledBuffer() : controller1 = StreamController(sync: true), controller2 = StreamController(sync: true) {
     controller1.onListen = _flush;
     controller2.onListen = _flush;
   }
+
   /// The events that will be emitted once either controller gets a listener, or
   /// `null` if the events have already been pushed to the controllers.
   ///
@@ -159,8 +157,8 @@ class _EntangledBuffer<T> {
 /// A wrapper that pipes inputs to [_EntangledBuffer] and exposes output from
 /// one of [_EntangledBuffer]'s controllers.
 class _EntangledController<T> extends StreamSinkBase<T> implements StreamController<T> {
-
   _EntangledController(this._buffer, this._isController1);
+
   /// The buffer that this wraps.
   final _EntangledBuffer<T> _buffer;
 

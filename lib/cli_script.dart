@@ -64,24 +64,37 @@ export 'src/temp.dart';
 /// If [debug] is `true`, extra information about [Script]s' lifecycles will be
 /// printed directly to stderr. As the name suggests, this is intended for use
 /// only when debugging.
-void wrapMain(FutureOr<void> Function() callback,
-    {bool chainStackTraces = true, bool? printScriptException, bool verboseTrace = false, bool debug = false}) {
-  withConfig(() {
-    Chain.capture(callback, onError: (error, chain) {
-      if (error is! ScriptException) {
-        stderr.writeln(error);
-        stderr.writeln(terseChain(chain));
-        // Use the same exit code that Dart does for unhandled exceptions.
-        exit(254);
-      }
+void wrapMain(
+  FutureOr<void> Function() callback, {
+  bool chainStackTraces = true,
+  bool? printScriptException,
+  bool verboseTrace = false,
+  bool debug = false,
+}) {
+  withConfig(
+    () {
+      Chain.capture(
+        callback,
+        onError: (error, chain) {
+          if (error is! ScriptException) {
+            stderr.writeln(error);
+            stderr.writeln(terseChain(chain));
+            // Use the same exit code that Dart does for unhandled exceptions.
+            exit(254);
+          }
 
-      if (printScriptException ?? debug) {
-        stderr.writeln(error);
-        stderr.writeln(terseChain(chain));
-      }
-      exit(error.exitCode);
-    }, when: chainStackTraces);
-  }, verboseTrace: verboseTrace, debug: debug);
+          if (printScriptException ?? debug) {
+            stderr.writeln(error);
+            stderr.writeln(terseChain(chain));
+          }
+          exit(error.exitCode);
+        },
+        when: chainStackTraces,
+      );
+    },
+    verboseTrace: verboseTrace,
+    debug: debug,
+  );
 }
 
 /// Runs an executable for its side effects.
@@ -95,21 +108,23 @@ void wrapMain(FutureOr<void> Function() callback,
 /// All other arguments are forwarded to [Process.start].
 ///
 /// [the README]: https://github.com/google/dart_cli_script/blob/main/README.md#argument-parsing
-Future<void> run(String executableAndArgs,
-        {Iterable<String>? args,
-        String? name,
-        String? workingDirectory,
-        Map<String, String>? environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false}) =>
-    Script(executableAndArgs,
-            args: args,
-            name: name,
-            workingDirectory: workingDirectory,
-            environment: environment,
-            includeParentEnvironment: includeParentEnvironment,
-            runInShell: runInShell)
-        .done;
+Future<void> run(
+  String executableAndArgs, {
+  Iterable<String>? args,
+  String? name,
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool includeParentEnvironment = true,
+  bool runInShell = false,
+}) => Script(
+  executableAndArgs,
+  args: args,
+  name: name,
+  workingDirectory: workingDirectory,
+  environment: environment,
+  includeParentEnvironment: includeParentEnvironment,
+  runInShell: runInShell,
+).done;
 
 /// Runs an executable and returns its stdout, with trailing newlines removed.
 ///
@@ -123,21 +138,23 @@ Future<void> run(String executableAndArgs,
 /// [the README]: https://github.com/google/dart_cli_script/blob/main/README.md#argument-parsing
 ///
 /// See also [Script.output].
-Future<String> output(String executableAndArgs,
-        {Iterable<String>? args,
-        String? name,
-        String? workingDirectory,
-        Map<String, String>? environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false}) =>
-    Script(executableAndArgs,
-            args: args,
-            name: name,
-            workingDirectory: workingDirectory,
-            environment: environment,
-            includeParentEnvironment: includeParentEnvironment,
-            runInShell: runInShell)
-        .output;
+Future<String> output(
+  String executableAndArgs, {
+  Iterable<String>? args,
+  String? name,
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool includeParentEnvironment = true,
+  bool runInShell = false,
+}) => Script(
+  executableAndArgs,
+  args: args,
+  name: name,
+  workingDirectory: workingDirectory,
+  environment: environment,
+  includeParentEnvironment: includeParentEnvironment,
+  runInShell: runInShell,
+).output;
 
 /// Runs an executable and returns a stream of lines it prints to stdout.
 ///
@@ -152,21 +169,23 @@ Future<String> output(String executableAndArgs,
 /// [the README]: https://github.com/google/dart_cli_script/blob/main/README.md#argument-parsing
 ///
 /// See also [Script.lines].
-Stream<String> lines(String executableAndArgs,
-        {Iterable<String>? args,
-        String? name,
-        String? workingDirectory,
-        Map<String, String>? environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false}) =>
-    Script(executableAndArgs,
-            args: args,
-            name: name,
-            workingDirectory: workingDirectory,
-            environment: environment,
-            includeParentEnvironment: includeParentEnvironment,
-            runInShell: runInShell)
-        .lines;
+Stream<String> lines(
+  String executableAndArgs, {
+  Iterable<String>? args,
+  String? name,
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool includeParentEnvironment = true,
+  bool runInShell = false,
+}) => Script(
+  executableAndArgs,
+  args: args,
+  name: name,
+  workingDirectory: workingDirectory,
+  environment: environment,
+  includeParentEnvironment: includeParentEnvironment,
+  runInShell: runInShell,
+).lines;
 
 /// Runs an executable and returns whether it returns exit code 0.
 ///
@@ -176,21 +195,23 @@ Stream<String> lines(String executableAndArgs,
 /// All other arguments are forwarded to [Process.start].
 ///
 /// [the README]: https://github.com/google/dart_cli_script/blob/main/README.md#argument-parsing
-Future<bool> check(String executableAndArgs,
-        {Iterable<String>? args,
-        String? name,
-        String? workingDirectory,
-        Map<String, String>? environment,
-        bool includeParentEnvironment = true,
-        bool runInShell = false}) =>
-    Script(executableAndArgs,
-            args: args,
-            name: name,
-            workingDirectory: workingDirectory,
-            environment: environment,
-            includeParentEnvironment: includeParentEnvironment,
-            runInShell: runInShell)
-        .success;
+Future<bool> check(
+  String executableAndArgs, {
+  Iterable<String>? args,
+  String? name,
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool includeParentEnvironment = true,
+  bool runInShell = false,
+}) => Script(
+  executableAndArgs,
+  args: args,
+  name: name,
+  workingDirectory: workingDirectory,
+  environment: environment,
+  includeParentEnvironment: includeParentEnvironment,
+  runInShell: runInShell,
+).success;
 
 /// Prints [message] to stderr and exits the current script.
 ///
@@ -223,24 +244,29 @@ Never fail(String message, {int exitCode = 1}) {
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
 /// [RegExp.new].
-StreamTransformer<String, String> grep(String regexp,
-    {bool exclude = false,
-    bool onlyMatching = false,
-    bool caseSensitive = true,
-    bool unicode = false,
-    bool dotAll = false}) {
+StreamTransformer<String, String> grep(
+  String regexp, {
+  bool exclude = false,
+  bool onlyMatching = false,
+  bool caseSensitive = true,
+  bool unicode = false,
+  bool dotAll = false,
+}) {
   if (exclude && onlyMatching) {
     throw ArgumentError("The exclude and onlyMatching flags can't both be set");
   }
 
   return NamedStreamTransformer.fromBind(
-      'grep',
-      (stream) => stream.grep(regexp,
-          exclude: exclude,
-          onlyMatching: onlyMatching,
-          caseSensitive: caseSensitive,
-          unicode: unicode,
-          dotAll: dotAll));
+    'grep',
+    (stream) => stream.grep(
+      regexp,
+      exclude: exclude,
+      onlyMatching: onlyMatching,
+      caseSensitive: caseSensitive,
+      unicode: unicode,
+      dotAll: dotAll,
+    ),
+  );
 }
 
 /// Returns a transformer that replaces matches of [regexp] with [replacement].
@@ -254,12 +280,18 @@ StreamTransformer<String, String> grep(String regexp,
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
 /// [RegExp.new].
-StreamTransformer<String, String> replace(String regexp, String replacement,
-        {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
-    NamedStreamTransformer.fromBind(
-        'replace',
-        (stream) => stream.replace(regexp, replacement,
-            all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll));
+StreamTransformer<String, String> replace(
+  String regexp,
+  String replacement, {
+  bool all = false,
+  bool caseSensitive = true,
+  bool unicode = false,
+  bool dotAll = false,
+}) => NamedStreamTransformer.fromBind(
+  'replace',
+  (stream) =>
+      stream.replace(regexp, replacement, all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll),
+);
 
 /// Returns a transformer that replaces matches of [regexp] with the result of
 /// calling [replace].
@@ -269,12 +301,18 @@ StreamTransformer<String, String> replace(String regexp, String replacement,
 ///
 /// The [caseSensitive], [unicode], and [dotAll] flags are the same as for
 /// [RegExp.new].
-StreamTransformer<String, String> replaceMapped(String regexp, String Function(Match match) replace,
-        {bool all = false, bool caseSensitive = true, bool unicode = false, bool dotAll = false}) =>
-    NamedStreamTransformer.fromBind(
-        'replaceMapped',
-        (stream) => stream.replaceMapped(regexp, replace,
-            all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll));
+StreamTransformer<String, String> replaceMapped(
+  String regexp,
+  String Function(Match match) replace, {
+  bool all = false,
+  bool caseSensitive = true,
+  bool unicode = false,
+  bool dotAll = false,
+}) => NamedStreamTransformer.fromBind(
+  'replaceMapped',
+  (stream) =>
+      stream.replaceMapped(regexp, replace, all: all, caseSensitive: caseSensitive, unicode: unicode, dotAll: dotAll),
+);
 
 /// A transformer that emits each string exactly as it was received, but also
 /// prints each string to [currentStderr].
@@ -391,8 +429,12 @@ IOSink append(String path) => File(path).openWrite(mode: FileMode.append);
 ///
 /// See also [LineStreamExtensions.xargs], which takes arguments directly from
 /// an existing string stream rather than [stdin].
-Script xargs(FutureOr<void> Function(List<String> args) callback,
-    {int? maxArgs, String? name, void Function(ProcessSignal signal)? onSignal}) {
+Script xargs(
+  FutureOr<void> Function(List<String> args) callback, {
+  int? maxArgs,
+  String? name,
+  void Function(ProcessSignal signal)? onSignal,
+}) {
   if (maxArgs != null && maxArgs < 1) {
     throw RangeError.range(maxArgs, 1, null, 'maxArgs');
   }
