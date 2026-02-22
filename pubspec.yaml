@@ -1,7 +1,7 @@
 name: cli_script
 version: 1.0.0
 description: Write scripts that call subprocesses with the ease of shell scripting and the power of Dart.
-repository: https://github.com/google/dart_cli_script
+repository: https://github.com/open-runtime/dart_cli_script
 environment:
   sdk: '>=3.3.0 <4.5.0'
 dependencies:
@@ -24,5 +24,6 @@ dev_dependencies:
   test_descriptor: ^2.0.2
   runtime_common_codestyle:
     git:
-      url: https://github.com/open-runtime/runtime_common_codestyle.git
-      ref: v0.1.2
+      url: git@github.com:open-runtime/runtime_common_codestyle.git
+      tag_pattern: v{{version}}
+    version: ^0.1.6
