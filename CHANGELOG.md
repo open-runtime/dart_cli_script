@@ -1,3 +1,32 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.1] - 2026-02-22
+
+### Breaking Changes
+- **BREAKING**: Updated the minimum Dart SDK requirement from 3.3.0 to 3.9.0.
+  - Migration: Ensure your project uses Dart SDK version 3.9.0 or higher. Update the `environment: sdk` constraint in your pubspec.yaml to be compatible with `^3.9.0`.
+
+### Added
+- Added runtime_ci_tooling for version bumping, changelog generation, and automated release management.
+- Added GitHub Actions workflows for release management (release.yaml) and issue triage (issue-triage.yaml).
+
+### Changed
+- Formatted all files at line-length 120.
+- Updated Dart SDK requirement to ^3.9.0.
+- Replaced ci.yml with ci.yaml and updated its content.
+
+### Removed
+- Removed workspace-only pubspec settings (sass_analysis dev_dependency) for cli_script.
+
+### Fixed
+- Stabilized cli_script standalone mode and subprocess env tests by pointing test subprocess spawning at the resolved Dart executable.
+- Suppressed included-file analyzer warning noise so local test and analysis workflows run reliably.
+
 ## 1.0.0
 
 * Stable release.
@@ -113,3 +142,5 @@
 ## 0.1.0
 
 * Initial release.
+
+[1.0.1]: https://github.com/open-runtime/dart_cli_script/releases/tag/v1.0.1

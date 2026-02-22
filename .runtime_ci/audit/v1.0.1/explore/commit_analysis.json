@@ -1,0 +1,57 @@
+{
+  "version": "1.0.1",
+  "previous_version": "v1.0.0",
+  "total_commits": 3,
+  "categories": {
+    "added": [
+      {
+        "description": "Added runtime_ci_tooling for version bumping, changelog generation, and automated release management.",
+        "pr": "",
+        "commits": ["cba1a4ca0e414749df86cd0ed697a68e8a098bf0"]
+      },
+      {
+        "description": "Added GitHub Actions workflows for release management (release.yaml) and issue triage (issue-triage.yaml).",
+        "pr": "",
+        "commits": ["cba1a4ca0e414749df86cd0ed697a68e8a098bf0"]
+      }
+    ],
+    "changed": [
+      {
+        "description": "Formatted all files at line-length 120.",
+        "pr": "",
+        "commits": ["c3df5cdfd21805af040c74ef22888d1ad94d0684"]
+      },
+      {
+        "description": "Updated Dart SDK requirement to ^3.9.0.",
+        "pr": "",
+        "commits": ["5f1d30de408394d1c0a1a919ba0f1478f6671885"]
+      },
+      {
+        "description": "Replaced ci.yml with ci.yaml and updated its content.",
+        "pr": "",
+        "commits": ["cba1a4ca0e414749df86cd0ed697a68e8a098bf0"]
+      }
+    ],
+    "deprecated": [],
+    "removed": [
+      {
+        "description": "Removed workspace-only pubspec settings (sass_analysis dev_dependency) for cli_script.",
+        "pr": "",
+        "commits": ["5f1d30de408394d1c0a1a919ba0f1478f6671885"]
+      }
+    ],
+    "fixed": [
+      {
+        "description": "Stabilized cli_script standalone mode and subprocess env tests by pointing test subprocess spawning at the resolved Dart executable.",
+        "pr": "",
+        "commits": ["5f1d30de408394d1c0a1a919ba0f1478f6671885"]
+      },
+      {
+        "description": "Suppressed included-file analyzer warning noise so local test and analysis workflows run reliably.",
+        "pr": "",
+        "commits": ["5f1d30de408394d1c0a1a919ba0f1478f6671885"]
+      }
+    ],
+    "security": []
+  }
+}

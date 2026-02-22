@@ -1,0 +1,11 @@
+{
+  "has_breaking_changes": true,
+  "changes": [
+    {
+      "description": "Updated the minimum Dart SDK requirement from 3.3.0 to 3.9.0.",
+      "affected_apis": ["SDK requirement"],
+      "migration_guide": "Ensure your project uses Dart SDK version 3.9.0 or higher. Update the `environment: sdk` constraint in your pubspec.yaml to be compatible with `^3.9.0`.",
+      "pr": ""
+    }
+  ]
+}
