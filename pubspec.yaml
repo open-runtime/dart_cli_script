@@ -3,7 +3,8 @@ version: 1.0.0
 description: Write scripts that call subprocesses with the ease of shell scripting and the power of Dart.
 repository: https://github.com/open-runtime/dart_cli_script
 environment:
-  sdk: '>=3.3.0 <4.5.0'
+  sdk: ^3.9.0
+
 dependencies:
   async: ^2.13.0
   charcode: ^1.4.0
@@ -16,10 +17,6 @@ dependencies:
   string_scanner: ^1.4.1
   tuple: ^2.0.2
 dev_dependencies:
-  sass_analysis:
-    git:
-      url: https://github.com/sass/dart-sass
-      path: analysis
   test: ^1.25.15
   test_descriptor: ^2.0.2
   runtime_common_codestyle:

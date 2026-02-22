@@ -35,7 +35,7 @@ Script dartScript(String code,
   final script = d.path('${uid()}.dart');
   File(script).writeAsStringSync(code);
 
-  return Script(arg(Platform.executable),
+  return Script(arg(Platform.resolvedExecutable),
       args: [...Platform.executableArguments, script, ...?args],
       name: name,
       workingDirectory: workingDirectory,

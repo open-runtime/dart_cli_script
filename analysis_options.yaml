@@ -1,1 +1,5 @@
 include: package:runtime_common_codestyle/recommended.yaml
+
+analyzer:
+  errors:
+    included_file_warning: ignore
