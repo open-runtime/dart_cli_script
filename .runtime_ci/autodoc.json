@@ -34,8 +34,8 @@
         "quickstart",
         "api_reference"
       ],
-      "hash": "7e595a65ce81beb83b4b3905f8e1f6d444711b78caa44eebe47b68346cb3bc9c",
-      "last_updated": "2026-02-22T22:18:04.588312Z"
+      "hash": "2e67ab1b0f9ca94cee998d49ccf2271e132dfcebab92284d41521e08b9f5c29f",
+      "last_updated": "2026-02-22T23:56:13.997923Z"
     },
     {
       "id": "top_level",
@@ -48,8 +48,8 @@
       "generate": [
         "quickstart"
       ],
-      "hash": "b7531ceeea1dff7417b515ba6d135ab91ade5926d3b4fa393c6e72d1d2f8624b",
-      "last_updated": "2026-02-22T22:18:04.594710Z"
+      "hash": "e7273393cc8ed7831ea398498bd86ffdeb18e09015008cc9802b0c6884530749",
+      "last_updated": "2026-02-22T23:56:14.006102Z"
     }
   ],
   "templates": {
