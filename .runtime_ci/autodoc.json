@@ -17,8 +17,8 @@
         "quickstart",
         "api_reference"
       ],
-      "hash": "",
-      "last_updated": null
+      "hash": "5d55f97315e3686b437b3fe0147319ab207dafa966e8fd5e42baa812935558ee",
+      "last_updated": "2026-02-22T22:18:04.580615Z"
     },
     {
       "id": "util",
@@ -34,8 +34,8 @@
         "quickstart",
         "api_reference"
       ],
-      "hash": "",
-      "last_updated": null
+      "hash": "7e595a65ce81beb83b4b3905f8e1f6d444711b78caa44eebe47b68346cb3bc9c",
+      "last_updated": "2026-02-22T22:18:04.588312Z"
     },
     {
       "id": "top_level",
@@ -48,8 +48,8 @@
       "generate": [
         "quickstart"
       ],
-      "hash": "",
-      "last_updated": null
+      "hash": "b7531ceeea1dff7417b515ba6d135ab91ade5926d3b4fa393c6e72d1d2f8624b",
+      "last_updated": "2026-02-22T22:18:04.594710Z"
     }
   ],
   "templates": {
