@@ -1,0 +1,2 @@
+- Upgraded generated GitHub Actions CI workflows to use `runtime_ci_tooling` `v0.11.2`.
+- Updated template versions metadata to track the latest CI dependencies.

@@ -1,0 +1,18 @@
+{
+  "version": "1.0.4",
+  "previous_version": "v1.0.3",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Updated CI tooling configuration to v0.11.2",
+        "commits": ["edc499e"]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}

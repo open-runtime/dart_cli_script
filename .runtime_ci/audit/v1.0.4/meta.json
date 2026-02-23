@@ -1,0 +1,82 @@
+{
+  "command": "merged-audit",
+  "started_at": "2026-02-23T23:22:40.229976",
+  "merged_from": [
+    {
+      "artifact": "cicd-audit-explore",
+      "command": "explore",
+      "args": [],
+      "started_at": "2026-02-23T23:13:28.156853",
+      "pid": 2596,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-02-23T23-13-28_2596",
+      "ci": true,
+      "completed_at": "2026-02-23T23:15:12.560553",
+      "duration_seconds": 104,
+      "exit_code": 0,
+      "artifacts": [
+        "explore/prompt.txt",
+        "explore/gemini_response.json",
+        "meta.json"
+      ]
+    },
+    {
+      "artifact": "cicd-audit-release-notes",
+      "command": "release-notes",
+      "args": [],
+      "started_at": "2026-02-23T23:20:03.071945",
+      "pid": 2716,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-02-23T23-20-03_2716",
+      "ci": true,
+      "completed_at": "2026-02-23T23:22:13.060889",
+      "duration_seconds": 129,
+      "artifacts": [
+        "release-notes/prompt.txt",
+        "release-notes/release_notes.md",
+        "release-notes/gemini_response.json",
+        "meta.json"
+      ]
+    },
+    {
+      "artifact": "cicd-audit-compose",
+      "command": "compose",
+      "args": [],
+      "started_at": "2026-02-23T23:16:10.764567",
+      "pid": 2692,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-02-23T23-16-10_2692",
+      "ci": true,
+      "completed_at": "2026-02-23T23:17:13.647991",
+      "duration_seconds": 62,
+      "artifacts": [
+        "compose/prompt.txt",
+        "compose/gemini_response.json",
+        "meta.json"
+      ]
+    },
+    {
+      "artifact": "cicd-audit-compose",
+      "command": "documentation",
+      "args": [],
+      "started_at": "2026-02-23T23:17:14.067228",
+      "pid": 4956,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-02-23T23-17-14_4956",
+      "ci": true
+    }
+  ],
+  "artifact_count": 5,
+  "total_files": 17,
+  "ci": true,
+  "platform": "linux",
+  "dart_version": "3.9.2"
+}
