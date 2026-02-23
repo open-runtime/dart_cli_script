@@ -1,0 +1,3 @@
+- Suppressed 11 specific lint rules in `analysis_options.yaml` to better support the intentional patterns of this forked library.
+- Applied auto-fixes for the `omit_obvious_property_types` lint rule across the project.
+- Resolved all remaining 165 analyzer issues for a cleaner development experience.

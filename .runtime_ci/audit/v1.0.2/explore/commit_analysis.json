@@ -1,0 +1,21 @@
+{
+  "version": "1.0.2",
+  "previous_version": "v1.0.1",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Suppressed 11 lint rules in analysis_options.yaml that flag intentional patterns in this forked library, and applied dart auto-fixes for omit_obvious_property_types.",
+        "pr": null,
+        "commits": [
+          "4351fe2da285384242b5ba22a168226886a502e6"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}
