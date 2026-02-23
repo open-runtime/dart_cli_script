@@ -1,0 +1,6 @@
+- **Decision**: patch. The only change in this release is an update to a development dependency (`runtime_ci_tooling`), which is classified as a maintenance/chore task. Since this does not introduce any new public APIs or cause any breaking changes, it warrants a patch release.
+- **Key Changes**:
+  - Bumped `runtime_ci_tooling` dev dependency from `^0.9.0` to `^0.10.0` for workspace-mode dependency resolution consistency.
+- **Breaking Changes**: None
+- **New Features**: None
+- **References**: Commit "chore: align runtime_ci_tooling dependency for workspace enablement"

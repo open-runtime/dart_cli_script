@@ -1,0 +1,19 @@
+{
+  "version": "1.0.3",
+  "previous_version": "v1.0.2",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Align runtime_ci_tooling dependency for workspace enablement",
+        "pr": "",
+        "commits": ["2e40966"]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}
