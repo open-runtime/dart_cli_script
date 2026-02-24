@@ -1,0 +1,2 @@
+- Fixed a `create-release` pipeline failure caused by unstaged changes from previous steps.
+- Bumped `runtime_ci_tooling` dev dependency to `^0.12.0` for improved release automation.
