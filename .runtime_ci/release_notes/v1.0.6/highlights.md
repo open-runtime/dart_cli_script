@@ -1,0 +1,2 @@
+- Updated the CI workflow to automatically format and push changes instead of failing builds on formatting issues.
+- Generated using `runtime_ci_tooling` v0.11.3 for consistent enterprise repository configuration.

@@ -1,0 +1,7 @@
+- **Decision**: patch. The changes only involve updates to CI workflow configurations, specifically adding an automated format job via a newer version of `runtime_ci_tooling`. There are no code logic changes, public API modifications, or new features. Since all commits reaching this pipeline warrant at least a patch release, a patch version bump is appropriate.
+- **Key Changes**:
+  - Regenerated GitHub Actions CI workflow to add an auto-format job (`.github/workflows/ci.yaml`).
+  - Updated `runtime_ci_tooling` template versions to `v0.11.3` (`.runtime_ci/template_versions.json`).
+- **Breaking Changes**: None
+- **New Features**: None
+- **References**: Commit "ci: regenerate CI workflow with auto-format job (runtime_ci_tooling v0.11.3)"

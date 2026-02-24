@@ -1,0 +1,20 @@
+{
+  "version": "1.0.6",
+  "previous_version": "v1.0.5",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Regenerated CI workflow to include an auto-format job and updated runtime_ci_tooling to v0.11.3",
+        "commits": [
+          "c6f67ad"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}
