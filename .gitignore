@@ -22,3 +22,10 @@ doc/api/
 
 # Runtime CI audit trails (local only)
 .runtime_ci/runs/
+
+# Custom lint logs
+custom_lint.log
+**/custom_lint.log
+
+# Claude AI session data
+.claude/
