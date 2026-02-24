@@ -1,0 +1,21 @@
+{
+  "version": "1.0.7",
+  "previous_version": "v1.0.6",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Updated CI workflow templates and enhanced autodoc coverage (added api_reference and examples generate types)",
+        "pr": null,
+        "commits": [
+          "8b06a6f06d5aea6a42e9b9bea895a48af43db172"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}

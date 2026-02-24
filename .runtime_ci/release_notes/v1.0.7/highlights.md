@@ -1,0 +1,3 @@
+- Updated CI workflow template hashes and configurations for reliable automation.
+- Expanded automated documentation generation to cover the Script Core module.
+- Added generation of examples and API references to improve developer documentation.
