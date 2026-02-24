@@ -4,6 +4,24 @@
   "max_concurrent": 4,
   "modules": [
     {
+      "id": "core",
+      "name": "Script Core",
+      "source_paths": [
+        "lib/src/"
+      ],
+      "lib_paths": [
+        "lib/src/"
+      ],
+      "output_path": "docs/core/",
+      "generate": [
+        "quickstart",
+        "api_reference",
+        "examples"
+      ],
+      "hash": "",
+      "last_updated": null
+    },
+    {
       "id": "extensions",
       "name": "Extensions",
       "source_paths": [
@@ -15,7 +33,8 @@
       "output_path": "docs/extensions/",
       "generate": [
         "quickstart",
-        "api_reference"
+        "api_reference",
+        "examples"
       ],
       "hash": "5d55f97315e3686b437b3fe0147319ab207dafa966e8fd5e42baa812935558ee",
       "last_updated": "2026-02-22T22:18:04.580615Z"
