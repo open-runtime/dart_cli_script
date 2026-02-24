@@ -1,0 +1,21 @@
+{
+  "version": "1.0.10",
+  "previous_version": "v1.0.9",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Updated .gitignore to ignore custom_lint.log and .claude/ directories.",
+        "pr": null,
+        "commits": [
+          "97eaeec78dd14159c0f69c8e9cc1db837571a290"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}
