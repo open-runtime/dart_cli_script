@@ -1,0 +1,3 @@
+- Implemented shell-level organization guards to prevent upstream leakage during issue triage in fork contexts.
+- Enforced `--repo` requirements for triage commands to ensure operations target authorized organizations.
+- Improved issue fetching logic for the internal triage command to enhance duplicate detection.

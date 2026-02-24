@@ -1,0 +1,29 @@
+{
+  "version": "1.0.9",
+  "previous_version": "v1.0.8",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [
+      {
+        "description": "Added shell-level org guards and `--repo` requirements to `triage.toml` to prevent upstream leakage when triaging issues in fork contexts",
+        "pr": null,
+        "commits": [
+          "d4ce22ac91de28a5e7783dc032824f7a406f9e9a"
+        ]
+      }
+    ],
+    "security": [
+      {
+        "description": "Added shell-level org guards and `--repo` requirements to `triage.toml` to prevent upstream leakage when triaging issues in fork contexts",
+        "pr": null,
+        "commits": [
+          "d4ce22ac91de28a5e7783dc032824f7a406f9e9a"
+        ]
+      }
+    ]
+  }
+}

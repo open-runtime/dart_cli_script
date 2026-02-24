@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2026-02-24
+
+### Security
+- Added shell-level org guards and `--repo` requirements to `triage.toml` to prevent upstream leakage when triaging issues in fork contexts
+
 ## [1.0.8] - 2026-02-24
 
 ### Changed
@@ -181,6 +186,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Initial release.
 
+[1.0.9]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.5...v1.0.6
