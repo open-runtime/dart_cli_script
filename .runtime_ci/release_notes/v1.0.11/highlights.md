@@ -1,0 +1,1 @@
+- Removed the accidentally committed `custom_lint.log` file to keep the repository clean.

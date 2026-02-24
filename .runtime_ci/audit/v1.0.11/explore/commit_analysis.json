@@ -1,0 +1,19 @@
+{
+  "version": "1.0.11",
+  "previous_version": "v1.0.10",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [
+      {
+        "description": "Removed the custom_lint.log junk file that was accidentally committed before the .gitignore rule was added",
+        "pr": "",
+        "commits": ["89409da4f9b3cf8a215cfbabc1bc7da625eeca59"]
+      }
+    ],
+    "security": []
+  }
+}
