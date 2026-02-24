@@ -1,0 +1,21 @@
+{
+  "version": "1.0.5",
+  "previous_version": "v1.0.4",
+  "total_commits": 2,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Sync runtime_ci templates and dependency metadata for enterprise BYOK prep",
+        "commits": [
+          "e4b94219bfd05c2b562be34e02c27b021d6568f2",
+          "2bb4ec5c6e1704a53e97d980fe86ba3c4a8ed5be"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}
