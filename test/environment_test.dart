@@ -39,23 +39,25 @@ void main() {
       expect(env, containsPair(varName, 'value'));
     });
 
-    group(
-      'with a non-empty environment',
-      () {
-        test('can override existing variables', () {
-          final varName = Platform.environment.keys.first;
+    group('with a non-empty environment', () {
+      test('can override existing variables', () {
+        final varName = uid();
+        withEnv(() {
+          env[varName] = 'original';
           env[varName] = 'new special fancy value';
           expect(env, containsPair(varName, 'new special fancy value'));
-        });
+        }, {varName: 'original'});
+      });
 
-        test('can remove existing variables', () {
-          final varName = Platform.environment.keys.last;
+      test('can remove existing variables', () {
+        final varName = uid();
+        withEnv(() {
+          env[varName] = 'value';
           env.remove(varName);
           expect(env, isNot(contains(varName)));
-        });
-      },
-      skip: Platform.environment.isEmpty ? 'These tests require at least one environment variable to be set' : null,
-    );
+        }, {varName: 'value'});
+      });
+    });
   });
 
   group('withEnv', () {
@@ -101,7 +103,8 @@ void main() {
     });
 
     test('replaces the outer environment with includeParentEnvironment: false', () {
-      withEnv(expectAsync0(() => expect(env, equals({'FOO': 'bar'}))), {'FOO': 'bar'}, includeParentEnvironment: false);
+      final k = uid();
+      withEnv(expectAsync0(() => expect(env, equals({k: 'bar'}))), {k: 'bar'}, includeParentEnvironment: false);
     });
   });
 
@@ -128,5 +131,179 @@ void main() {
         varName.toUpperCase(): 'inner value',
       });
     });
+
+    // Explicit: on Windows, case-colliding keys in the override map canonicalize to one entry; last in iteration order wins.
+    test('case-collision: synthetic keys in withEnv map canonicalize to one entry; last in iteration order wins', () {
+      final k = uid();
+      withEnv(
+        expectAsync0(() {
+          expect(env[k], equals('last'));
+          expect(env[k.toUpperCase()], equals('last'));
+          expect(env.length, equals(1));
+        }),
+        {k: 'first', k.toUpperCase(): 'last'},
+        includeParentEnvironment: false,
+      );
+    });
+
+    test('case-collision: inverse order confirms last-in-iteration-order wins', () {
+      final k = uid();
+      withEnv(
+        expectAsync0(() {
+          expect(env[k], equals('first'));
+          expect(env[k.toUpperCase()], equals('first'));
+          expect(env.length, equals(1));
+        }),
+        {k.toUpperCase(): 'last', k: 'first'},
+        includeParentEnvironment: false,
+      );
+    });
+
+    test('case-collision: direct map ops with synthetic keys overwrite same slot', () {
+      final k = uid();
+      withEnv(() {
+        env[k] = 'lower';
+        env[k.toUpperCase()] = 'upper';
+        expect(env[k], equals('upper'));
+        expect(env[k.toUpperCase()], equals('upper'));
+        env[k] = 'final';
+        expect(env[k.toUpperCase()], equals('final'));
+      }, {});
+    });
+
+    test('includeParentEnvironment: false with differing key casing canonicalizes to single entry', () {
+      final base = uid();
+      final kLower = base;
+      final kUpper = base.toUpperCase();
+      final kMixed = base.isEmpty ? base : '${base[0].toUpperCase()}${base.substring(1)}';
+      withEnv(
+        expectAsync0(() {
+          expect(env[kLower], equals('bar'));
+          expect(env[kUpper], equals('bar'));
+          expect(env[kMixed], equals('bar'));
+          expect(env.length, equals(1));
+        }),
+        {kMixed: 'bar', kUpper: 'bar', kLower: 'bar'},
+        includeParentEnvironment: false,
+      );
+    });
+
+    test('includeParentEnvironment: false replacement when key casing differs, last in iteration order wins', () {
+      final k = uid();
+      withEnv(
+        expectAsync0(() {
+          expect(env[k], equals('z'));
+          expect(env[k.toUpperCase()], equals('z'));
+          expect(env.length, equals(1));
+        }),
+        {k: 'a', k.toUpperCase(): 'z'},
+        includeParentEnvironment: false,
+      );
+    });
+
+    test('includeParentEnvironment: true with case-collision in override map, last in iteration order wins', () {
+      final k = uid();
+      withEnv(() {
+        env[k] = 'parent';
+        withEnv(
+          expectAsync0(() {
+            expect(env[k], equals('override_last'));
+            expect(env[k.toUpperCase()], equals('override_last'));
+          }),
+          {k: 'override_first', k.toUpperCase(): 'override_last'},
+          includeParentEnvironment: true,
+        );
+      }, {});
+    });
+
+    test(
+      'includeParentEnvironment: true with case-collision in override map, inverse order confirms last-in-iteration-order wins',
+      () {
+        final k = uid();
+        withEnv(() {
+          env[k] = 'parent';
+          withEnv(
+            expectAsync0(() {
+              expect(env[k], equals('first'));
+              expect(env[k.toUpperCase()], equals('first'));
+            }),
+            {k.toUpperCase(): 'last', k: 'first'},
+            includeParentEnvironment: true,
+          );
+        }, {});
+      },
+    );
+
+    test('env keys canonicalized to single entry on Windows (case-insensitive)', () {
+      final varName = uid();
+      env[varName] = 'value';
+      final keys = env.keys.where((k) => k.toUpperCase() == varName.toUpperCase()).toList();
+      expect(keys.length, equals(1));
+      expect(keys.single.toUpperCase(), equals(varName.toUpperCase()));
+      expect(env[varName], equals('value'));
+      expect(env[varName.toUpperCase()], equals('value'));
+    });
+
+    // Edge case: case-collision with null values (remove-vs-set ordering semantics).
+    test('case-collision null: {k: value, K: null} — last (null) wins, variable removed', () {
+      final k = uid();
+      withEnv(
+        expectAsync0(() {
+          expect(env, isNot(contains(k)));
+          expect(env, isNot(contains(k.toUpperCase())));
+        }),
+        {k: 'value', k.toUpperCase(): null},
+        includeParentEnvironment: false,
+      );
+    });
+
+    test('case-collision null: {k: null, K: value} — last (value) wins, variable set', () {
+      final k = uid();
+      withEnv(
+        expectAsync0(() {
+          expect(env[k], equals('value'));
+          expect(env[k.toUpperCase()], equals('value'));
+          expect(env.length, equals(1));
+        }),
+        {k: null, k.toUpperCase(): 'value'},
+        includeParentEnvironment: false,
+      );
+    });
+
+    test(
+      'case-collision null: {k: value, K: null} with includeParentEnvironment: true — last (null) wins, variable removed',
+      () {
+        final k = uid();
+        withEnv(() {
+          env[k] = 'parent';
+          withEnv(
+            expectAsync0(() {
+              expect(env, isNot(contains(k)));
+              expect(env, isNot(contains(k.toUpperCase())));
+            }),
+            {k: 'value', k.toUpperCase(): null},
+            includeParentEnvironment: true,
+          );
+        }, {});
+      },
+    );
+
+    test(
+      'case-collision null: {k: null, K: value} with includeParentEnvironment: true — last (value) wins, variable set',
+      () {
+        final k = uid();
+        withEnv(() {
+          env[k] = 'parent';
+          withEnv(
+            expectAsync0(() {
+              expect(env[k], equals('value'));
+              expect(env[k.toUpperCase()], equals('value'));
+            }),
+            {k: null, k.toUpperCase(): 'value'},
+            includeParentEnvironment: true,
+          );
+        }, {});
+      },
+    );
   }, testOn: 'windows');
 }

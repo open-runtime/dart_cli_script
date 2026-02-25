@@ -64,6 +64,53 @@ class CliArguments {
     while (scanner.scanChar($space)) {}
   }
 
+  /// Glob characters that can be escaped with a backslash.
+  static const _globEscapedChars = {
+    $asterisk,
+    $question,
+    $lbracket,
+    $rbracket,
+    $lbrace,
+    $rbrace,
+    $lparen,
+    $rparen,
+    $comma,
+    $dash,
+    $backslash,
+  };
+
+  /// Returns whether [pattern] is likely an absolute Windows path glob.
+  ///
+  /// We only normalize absolute Windows-style paths so we don't corrupt
+  /// shell-style escaped glob characters like `\\*.txt`.
+  static bool _isLikelyWindowsAbsolutePathGlob(String pattern) {
+    if (!Platform.isWindows || pattern.isEmpty) return false;
+    if (RegExp(r'^[A-Za-z](\\)?:[\\/]').hasMatch(pattern)) return true;
+    if (RegExp(r'^[A-Za-z]:[\\/]').hasMatch(pattern)) return true;
+    if (pattern.startsWith(r'\\') || pattern.startsWith('//')) return true;
+    if (pattern.codeUnitAt(0) == $backslash && pattern.length > 1) {
+      return !_globEscapedChars.contains(pattern.codeUnitAt(1));
+    }
+    return false;
+  }
+
+  /// Normalizes a glob pattern to POSIX separators for the glob package.
+  ///
+  /// `package:glob` expects `/` as path separators on all platforms.
+  static String _normalizeGlobPattern(String pattern) {
+    if (!_isLikelyWindowsAbsolutePathGlob(pattern)) return pattern;
+    // Glob.quote() may escape `C:` as `C\:`, so normalize that first.
+    final normalizedDrivePrefix = pattern.replaceFirstMapped(RegExp(r'^([A-Za-z])\\:'), (match) => '${match[1]}:');
+    return normalizedDrivePrefix.replaceAll('\\', '/');
+  }
+
+  static bool _containsGlobSyntax(String pattern) =>
+      pattern.contains('*') ||
+      pattern.contains('?') ||
+      pattern.contains('[') ||
+      pattern.contains('{') ||
+      pattern.contains('(');
+
   /// Scans a single argument.
   static _Argument _scanArg(StringScanner scanner, {required bool glob}) {
     final plainBuffer = StringBuffer();
@@ -72,8 +119,17 @@ class CliArguments {
     while (true) {
       final next = scanner.peekChar();
       if (next == $space || next == null) {
-        final glob = isGlobActive ? globBuffer?.toString() : null;
-        return _Argument(plainBuffer.toString(), glob == null ? null : Glob(glob));
+        final rawGlob = globBuffer?.toString();
+        final normalizedGlob = rawGlob == null ? null : _normalizeGlobPattern(rawGlob);
+        final windowsAbsoluteGlob =
+            glob &&
+            !isGlobActive &&
+            rawGlob != null &&
+            _isLikelyWindowsAbsolutePathGlob(rawGlob) &&
+            normalizedGlob != null &&
+            _containsGlobSyntax(normalizedGlob);
+        final globPattern = (isGlobActive || windowsAbsoluteGlob) ? normalizedGlob : null;
+        return _Argument(plainBuffer.toString(), globPattern == null ? null : Glob(globPattern));
       } else if (next == $double_quote || next == $single_quote) {
         scanner.readChar();
 
@@ -157,9 +213,12 @@ class _Argument {
   Future<List<String>> resolve({String? root}) async {
     final glob = _glob;
     if (glob != null) {
-      final absolute = p.isAbsolute(glob.pattern);
+      final absolute = Platform.isWindows
+          ? CliArguments._isLikelyWindowsAbsolutePathGlob(glob.pattern)
+          : p.isAbsolute(glob.pattern);
       final globbed = [
-        await for (final entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root),
+        await for (final entity in glob.list(root: root))
+          absolute ? p.normalize(entity.path) : p.relative(entity.path, from: root),
       ];
       if (globbed.isNotEmpty) return globbed;
     }
