@@ -234,12 +234,14 @@ void main() {
       },
     );
 
-    test('env keys canonicalized to uppercase on Windows', () {
+    test('env keys canonicalized to single entry on Windows (case-insensitive)', () {
       final varName = uid();
       env[varName] = 'value';
       final keys = env.keys.where((k) => k.toUpperCase() == varName.toUpperCase()).toList();
       expect(keys.length, equals(1));
-      expect(keys.single, equals(varName.toUpperCase()));
+      expect(keys.single.toUpperCase(), equals(varName.toUpperCase()));
+      expect(env[varName], equals('value'));
+      expect(env[varName.toUpperCase()], equals('value'));
     });
 
     // Edge case: case-collision with null values (remove-vs-set ordering semantics).

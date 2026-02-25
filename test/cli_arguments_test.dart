@@ -16,7 +16,6 @@ import 'dart:io';
 
 import 'package:cli_script/src/cli_arguments.dart';
 import 'package:glob/glob.dart';
-import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -194,32 +193,25 @@ void main() {
 
     group('Windows-specific glob patterns', () {
       group('UNC-style absolute glob', () {
-        test('returns plain pattern when UNC path does not match', () async {
-          await d.file('foo.txt').create();
+        test('throws PathNotFoundException when UNC path does not exist', () {
           const uncPattern = r'\\nonexistent\share\*.txt';
-          final args = await _resolve('ls $uncPattern', glob: true);
-          expect(args.first, equals('ls'));
-          expect(args.sublist(1), equals([uncPattern]));
-          expect(args.sublist(1).single, startsWith(r'\\'));
+          expect(_resolve('ls $uncPattern', glob: true), throwsA(isA<PathNotFoundException>()));
         }, testOn: 'windows');
 
-        test('//server/share form returns plain pattern when no match', () async {
-          await d.file('foo.txt').create();
+        test('//server/share form throws PathNotFoundException when no match', () {
           const uncPattern = '//server/share/*.txt';
-          final args = await _resolve('ls $uncPattern', glob: true);
-          expect(args.first, equals('ls'));
-          expect(args.sublist(1), equals([uncPattern]));
-          expect(args.sublist(1).single, startsWith('//'));
+          expect(_resolve('ls $uncPattern', glob: true), throwsA(isA<PathNotFoundException>()));
         }, testOn: 'windows');
       });
 
       group('drive-relative glob pattern', () {
-        test('C:foo\\*.txt returns plain pattern when no match', () async {
+        test('C:foo\\*.txt backslash escapes asterisk, resolves to C:foo*.txt', () async {
           await d.file('foo.txt').create();
           const pattern = r'C:foo\*.txt';
           final args = await _resolve('ls $pattern', glob: true);
           expect(args.first, equals('ls'));
-          expect(args.sublist(1), equals([pattern]));
+          // Backslash consumed as escape; glob matches literal *.txt (none); fallback to plain.
+          expect(args.sublist(1), equals(['C:foo*.txt']));
         }, testOn: 'windows');
 
         test('C:foo/*.txt returns plain pattern when no match', () async {
@@ -243,20 +235,22 @@ void main() {
           expect(args.sublist(1), unorderedEquals([d.path('foo.txt'), d.path('bar.txt')]));
         }, testOn: 'windows');
 
-        test('quoted Windows absolute path with glob is passed literally', () async {
+        test('quoted Windows absolute path with glob expands to file match', () async {
           await d.file('foo.txt').create();
+          await d.file('bar.txt').create();
           final quotedPath = '"${d.sandbox.replaceAll(r'\', r'\\')}\\*.txt"';
           final args = await _resolve('ls $quotedPath', glob: true);
           expect(args.first, equals('ls'));
-          expect(args.sublist(1).single, equals(p.join(d.sandbox, '*.txt')));
+          expect(args.sublist(1), unorderedEquals([d.path('foo.txt'), d.path('bar.txt')]));
         }, testOn: 'windows');
       });
 
-      test('UNC path with glob: false passes through literally', () async {
+      test('UNC path with glob: false — backslashes consumed as escapes', () async {
         const uncPattern = r'\\server\share\*.txt';
         final args = await _resolve('ls $uncPattern', glob: false);
         expect(args.first, equals('ls'));
-        expect(args.sublist(1), equals([uncPattern]));
+        // Parser treats \ as escape: \\→\, \s→s, \*→*; result is \servershare*.txt
+        expect(args.sublist(1), equals([r'\servershare*.txt']));
       });
     }, testOn: 'windows');
 

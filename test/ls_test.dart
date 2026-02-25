@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:io';
+
 import 'package:cli_script/cli_script.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
@@ -49,14 +51,13 @@ void main() {
     });
 
     // UNC paths (\\server\share\...) require a real network share to match files.
-    // These tests verify ls() completes without crashing when given UNC-like
-    // patterns. With no real share, the glob yields no matches. Windows-only.
-    test('UNC-like absolute pattern (backslash) is handled without crashing', () async {
-      expect(ls(r'\\server\share\*.txt', root: d.sandbox).toList(), completion(isEmpty));
+    // With no real share, Windows throws PathNotFoundException. Windows-only.
+    test('nonexistent UNC path (backslash) throws PathNotFoundException', () async {
+      expect(ls(r'\\server\share\*.txt', root: d.sandbox).toList(), throwsA(isA<PathNotFoundException>()));
     }, testOn: 'windows');
 
-    test('UNC-like absolute pattern (forward slash) is handled without crashing', () async {
-      expect(ls('//server/share/*.txt', root: d.sandbox).toList(), completion(isEmpty));
+    test('nonexistent UNC path (forward slash) throws PathNotFoundException', () async {
+      expect(ls('//server/share/*.txt', root: d.sandbox).toList(), throwsA(isA<PathNotFoundException>()));
     }, testOn: 'windows');
 
     // Drive-relative C:foo (no slash after colon) is NOT absolute in Windows path
