@@ -22,7 +22,15 @@ import 'util.dart';
 void main() {
   group('env', () {
     test('is equal to Platform.environment by default', () {
-      expect(env, equals(Platform.environment));
+      if (Platform.isWindows) {
+        // Windows env keys are case-insensitive; env canonicalizes keys.
+        expect(env.length, equals(Platform.environment.length));
+        for (final e in Platform.environment.entries) {
+          expect(env[e.key], equals(e.value));
+        }
+      } else {
+        expect(env, equals(Platform.environment));
+      }
     });
 
     test('can set new variables', () {

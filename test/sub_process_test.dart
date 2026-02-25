@@ -56,9 +56,12 @@ void main() {
   test('an error while spawning is printed to stderr', () {
     final script = Script('non-existent-executable');
     expect(script.exitCode, completion(equals(257)));
+    final expectedMessage = Platform.isWindows
+        ? 'ProcessException: The system cannot find the file specified'
+        : 'ProcessException: No such file or directory';
     expect(
       script.stderr.lines,
-      emitsInOrder(['Error in non-existent-executable:', 'ProcessException: No such file or directory']),
+      emitsInOrder(['Error in non-existent-executable:', expectedMessage]),
     );
   });
 
@@ -97,8 +100,21 @@ void main() {
   });
 
   group('subprocess environment', () {
-    test('defaults to the parent environment', () {
-      expect(_getSubprocessEnvironment(), completion(equals(Platform.environment)));
+    test('defaults to the parent environment', () async {
+      final subprocessEnv = await _getSubprocessEnvironment();
+      if (Platform.isWindows) {
+        // Windows env keys are case-insensitive; compare case-insensitively.
+        expect(subprocessEnv.length, equals(Platform.environment.length));
+        for (final e in Platform.environment.entries) {
+          final key = subprocessEnv.keys.firstWhere(
+            (k) => k.toUpperCase() == e.key.toUpperCase(),
+            orElse: () => throw StateError('Key ${e.key} not found in subprocess env'),
+          );
+          expect(subprocessEnv[key], equals(e.value));
+        }
+      } else {
+        expect(subprocessEnv, equals(Platform.environment));
+      }
     });
 
     test('includes modifications to env', () {

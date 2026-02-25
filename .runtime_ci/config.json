@@ -29,12 +29,7 @@
       "macos-x64",
       "windows-x64",
       "windows-arm64"
-    ],
-    "_comment_runner_overrides": "Optional: override platform IDs to custom runs-on labels (e.g. org-managed GitHub-hosted runners). Keys must match ci.platforms entries.",
-    "runner_overrides": {
-      "ubuntu-arm64": "runtime-ubuntu-24.04-arm64-208gb-64core",
-      "windows-arm64": "runtime-windows-11-arm64-208gb-64core"
-    }
+    ]
   },
   "gcp": {
     "project": ""

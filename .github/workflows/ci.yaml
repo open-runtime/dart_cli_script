@@ -193,6 +193,7 @@ jobs:
           path: |
             test/integration/fixtures/bin/
             **/test-results/
+          if-no-files-found: ignore
           retention-days: 7
 
 # --- BEGIN USER: post-test ---

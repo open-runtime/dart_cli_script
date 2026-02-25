@@ -15,14 +15,14 @@ void main() {
 
       expect(script.kill(), true);
       expect(script.done, throwsScriptException(-15));
-    });
+    }, testOn: '!windows');
 
     test('interrupts before process starts', () async {
       final script = mainScript('throw Exception("oh no!");');
 
       expect(script.kill(), true);
       expect(script.done, throwsScriptException(-15));
-    });
+    }, testOn: '!windows');
 
     test('interrupts with custom signal', () async {
       final script = mainScript('while (true) {}');
@@ -30,7 +30,7 @@ void main() {
 
       expect(script.kill(ProcessSignal.sigint), true);
       expect(script.done, throwsScriptException(-2));
-    });
+    }, testOn: '!windows');
 
     test('can interrupt after Future.timeout', () async {
       final script = mainScript('while (true) {}');
@@ -39,7 +39,7 @@ void main() {
       script.done.timeout(const Duration(milliseconds: 1), onTimeout: script.kill);
 
       expect(script.done, throwsScriptException(-15));
-    });
+    }, testOn: '!windows');
 
     test("can't be interrupt after it already exited", () async {
       final script = mainScript('print("done!");');
