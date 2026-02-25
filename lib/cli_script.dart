@@ -453,6 +453,7 @@ Script xargs(
 /// If [root] is passed, it's used as the root directory for relative globs.
 bool _isLikelyWindowsAbsolutePathGlob(String pattern) {
   if (!Platform.isWindows || pattern.isEmpty) return false;
+  if (RegExp(r'^[A-Za-z](\\)?:[\\/]').hasMatch(pattern)) return true;
   if (RegExp(r'^[A-Za-z]:[\\/]').hasMatch(pattern)) return true;
   if (pattern.startsWith(r'\\') || pattern.startsWith('//')) return true;
   const escapedGlobChars = '*?[]{}(),-\\';
@@ -462,10 +463,16 @@ bool _isLikelyWindowsAbsolutePathGlob(String pattern) {
   return false;
 }
 
+String _normalizeWindowsGlobPattern(String pattern) {
+  if (!_isLikelyWindowsAbsolutePathGlob(pattern)) return pattern;
+  final normalizedDrivePrefix = pattern.replaceFirstMapped(RegExp(r'^([A-Za-z])\\:'), (match) => '${match[1]}:');
+  return normalizedDrivePrefix.replaceAll('\\', '/');
+}
+
 Stream<String> ls(String glob, {String? root}) {
   final absolute = Platform.isWindows ? _isLikelyWindowsAbsolutePathGlob(glob) : p.isAbsolute(glob);
-  final normalizedGlob = _isLikelyWindowsAbsolutePathGlob(glob) ? glob.replaceAll('\\', '/') : glob;
+  final normalizedGlob = _normalizeWindowsGlobPattern(glob);
   return Glob(
     normalizedGlob,
-  ).list(root: root).map((entity) => absolute ? entity.path : p.relative(entity.path, from: root));
+  ).list(root: root).map((entity) => absolute ? p.normalize(entity.path) : p.relative(entity.path, from: root));
 }

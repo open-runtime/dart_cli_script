@@ -85,6 +85,7 @@ class CliArguments {
   /// shell-style escaped glob characters like `\\*.txt`.
   static bool _isLikelyWindowsAbsolutePathGlob(String pattern) {
     if (!Platform.isWindows || pattern.isEmpty) return false;
+    if (RegExp(r'^[A-Za-z](\\)?:[\\/]').hasMatch(pattern)) return true;
     if (RegExp(r'^[A-Za-z]:[\\/]').hasMatch(pattern)) return true;
     if (pattern.startsWith(r'\\') || pattern.startsWith('//')) return true;
     if (pattern.codeUnitAt(0) == $backslash && pattern.length > 1) {
@@ -96,8 +97,19 @@ class CliArguments {
   /// Normalizes a glob pattern to POSIX separators for the glob package.
   ///
   /// `package:glob` expects `/` as path separators on all platforms.
-  static String _normalizeGlobPattern(String pattern) =>
-      _isLikelyWindowsAbsolutePathGlob(pattern) ? pattern.replaceAll('\\', '/') : pattern;
+  static String _normalizeGlobPattern(String pattern) {
+    if (!_isLikelyWindowsAbsolutePathGlob(pattern)) return pattern;
+    // Glob.quote() may escape `C:` as `C\:`, so normalize that first.
+    final normalizedDrivePrefix = pattern.replaceFirstMapped(RegExp(r'^([A-Za-z])\\:'), (match) => '${match[1]}:');
+    return normalizedDrivePrefix.replaceAll('\\', '/');
+  }
+
+  static bool _containsGlobSyntax(String pattern) =>
+      pattern.contains('*') ||
+      pattern.contains('?') ||
+      pattern.contains('[') ||
+      pattern.contains('{') ||
+      pattern.contains('(');
 
   /// Scans a single argument.
   static _Argument _scanArg(StringScanner scanner, {required bool glob}) {
@@ -107,8 +119,17 @@ class CliArguments {
     while (true) {
       final next = scanner.peekChar();
       if (next == $space || next == null) {
-        final glob = isGlobActive ? globBuffer?.toString() : null;
-        return _Argument(plainBuffer.toString(), glob == null ? null : Glob(_normalizeGlobPattern(glob)));
+        final rawGlob = globBuffer?.toString();
+        final normalizedGlob = rawGlob == null ? null : _normalizeGlobPattern(rawGlob);
+        final windowsAbsoluteGlob =
+            glob &&
+            !isGlobActive &&
+            rawGlob != null &&
+            _isLikelyWindowsAbsolutePathGlob(rawGlob) &&
+            normalizedGlob != null &&
+            _containsGlobSyntax(normalizedGlob);
+        final globPattern = (isGlobActive || windowsAbsoluteGlob) ? normalizedGlob : null;
+        return _Argument(plainBuffer.toString(), globPattern == null ? null : Glob(globPattern));
       } else if (next == $double_quote || next == $single_quote) {
         scanner.readChar();
 
