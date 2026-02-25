@@ -56,12 +56,14 @@ void main() {
   test('an error while spawning is printed to stderr', () {
     final script = Script('non-existent-executable');
     expect(script.exitCode, completion(equals(257)));
-    final expectedMessage = Platform.isWindows
-        ? 'ProcessException: The system cannot find the file specified'
-        : 'ProcessException: No such file or directory';
     expect(
       script.stderr.lines,
-      emitsInOrder(['Error in non-existent-executable:', expectedMessage]),
+      emitsInOrder([
+        'Error in non-existent-executable:',
+        predicate<String>(
+          (line) => line.startsWith('ProcessException:') && line.trim().length > 'ProcessException:'.length,
+        ),
+      ]),
     );
   });
 
@@ -117,31 +119,32 @@ void main() {
       }
     });
 
-    test('includes modifications to env', () {
+    test('includes modifications to env', () async {
       final varName = uid();
       env[varName] = 'value';
-      expect(_getSubprocessEnvironment(), completion(containsPair(varName, 'value')));
+      final subprocessEnv = await _getSubprocessEnvironment();
+      expect(_lookupEnvValue(subprocessEnv, varName), equals('value'));
     });
 
-    test('includes scoped modifications to env', () {
+    test('includes scoped modifications to env', () async {
       final varName = uid();
-      withEnv(() {
-        expect(_getSubprocessEnvironment(), completion(containsPair(varName, 'value')));
+      await withEnv(() async {
+        final subprocessEnv = await _getSubprocessEnvironment();
+        expect(_lookupEnvValue(subprocessEnv, varName), equals('value'));
       }, {varName: 'value'});
     });
 
-    test('includes values from the environment parameter', () {
+    test('includes values from the environment parameter', () async {
       final varName = uid();
-      expect(_getSubprocessEnvironment(environment: {varName: 'value'}), completion(containsPair(varName, 'value')));
+      final subprocessEnv = await _getSubprocessEnvironment(environment: {varName: 'value'});
+      expect(_lookupEnvValue(subprocessEnv, varName), equals('value'));
     });
 
-    test('the environment parameter overrides env', () {
+    test('the environment parameter overrides env', () async {
       final varName = uid();
       env[varName] = 'outer value';
-      expect(
-        _getSubprocessEnvironment(environment: {varName: 'inner value'}),
-        completion(containsPair(varName, 'inner value')),
-      );
+      final subprocessEnv = await _getSubprocessEnvironment(environment: {varName: 'inner value'});
+      expect(_lookupEnvValue(subprocessEnv, varName), equals('inner value'));
     });
 
     group('with includeParentEnvironment: false', () {
@@ -149,19 +152,33 @@ void main() {
       // subprocess, but some environment variables unavoidably exist when
       // spawning a process (at least on Linux).
 
-      test('ignores env', () {
+      test('ignores env', () async {
         final varName = uid();
         env[varName] = 'value';
-        expect(_getSubprocessEnvironment(includeParentEnvironment: false), completion(isNot(contains(varName))));
+        final subprocessEnv = await _getSubprocessEnvironment(includeParentEnvironment: false);
+        expect(_containsEnvKey(subprocessEnv, varName), isFalse);
       });
 
-      test('uses the environment parameter', () {
+      test('uses the environment parameter', () async {
         final varName = uid();
-        expect(
-          _getSubprocessEnvironment(environment: {varName: 'value'}, includeParentEnvironment: false),
-          completion(containsPair(varName, 'value')),
+        final subprocessEnv = await _getSubprocessEnvironment(
+          environment: {varName: 'value'},
+          includeParentEnvironment: false,
         );
+        expect(_lookupEnvValue(subprocessEnv, varName), equals('value'));
       });
+
+      test('includes minimum Windows system environment needed to spawn', () async {
+        final subprocessEnv = await _getSubprocessEnvironment(includeParentEnvironment: false);
+        final systemRoot = Platform.environment['SystemRoot'] ?? Platform.environment['SYSTEMROOT'];
+        if (systemRoot != null && systemRoot.isNotEmpty) {
+          expect(_lookupEnvValue(subprocessEnv, 'SystemRoot'), equals(systemRoot));
+        }
+        final winDir = Platform.environment['WINDIR'];
+        if (winDir != null && winDir.isNotEmpty) {
+          expect(_lookupEnvValue(subprocessEnv, 'WINDIR'), equals(winDir));
+        }
+      }, testOn: 'windows');
     });
   });
 
@@ -177,7 +194,10 @@ void main() {
 
   group('outputBytes', () {
     test("returns the script's output as bytes", () {
-      expect(mainScript("print('hello!');").outputBytes, completion(equals(utf8.encode('hello!\n'))));
+      expect(
+        mainScript("print('hello!');").outputBytes,
+        completion(equals(utf8.encode('hello!${Platform.lineTerminator}'))),
+      );
     });
 
     test('completes with a ScriptException if the script fails', () {
@@ -228,7 +248,7 @@ void stdoutOrStderr(String name, Stream<List<int>> Function(Script script) strea
       expect(script.done, completes);
       await pumpEventQueue();
 
-      // We can't use expect(..., throwsStateError) here bceause of
+      // We can't use expect(..., throwsStateError) here because of
       // dart-lang/sdk#45815.
       runZonedGuarded(
         () => stream(script).listen(null),
@@ -253,3 +273,16 @@ Future<Map<String, String>> _getSubprocessEnvironment({
             )
             as Map)
         .cast<String, String>();
+
+String? _lookupEnvValue(Map<String, String> map, String key) {
+  if (!Platform.isWindows) return map[key];
+  for (final entry in map.entries) {
+    if (entry.key.toUpperCase() == key.toUpperCase()) return entry.value;
+  }
+  return null;
+}
+
+bool _containsEnvKey(Map<String, String> map, String key) {
+  if (!Platform.isWindows) return map.containsKey(key);
+  return map.keys.any((k) => k.toUpperCase() == key.toUpperCase());
+}

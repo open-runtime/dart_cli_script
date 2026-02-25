@@ -108,6 +108,23 @@ class Script {
               : withEnv(() => env, environment!);
         }
 
+        if (!includeParentEnvironment) {
+          // Pass an explicit map rather than null so subprocesses don't
+          // implicitly inherit parent environment variables.
+          environment ??= <String, String>{};
+
+          if (Platform.isWindows) {
+            // Some Windows executables (including Dart in certain contexts)
+            // require a minimal base environment to spawn reliably.
+            final windowsBase = <String, String>{};
+            final systemRoot = Platform.environment['SystemRoot'] ?? Platform.environment['SYSTEMROOT'];
+            final winDir = Platform.environment['WINDIR'];
+            if (systemRoot != null && systemRoot.isNotEmpty) windowsBase['SystemRoot'] = systemRoot;
+            if (winDir != null && winDir.isNotEmpty) windowsBase['WINDIR'] = winDir;
+            environment = {...windowsBase, ...environment!};
+          }
+        }
+
         final allArgs = [...await parsedExecutableAndArgs.arguments(root: workingDirectory), ...?args];
 
         if (inDebugMode) {
@@ -733,6 +750,9 @@ class Script {
   ///
   /// Like `collectBytes(stdout)`, but throws a [ScriptException] if the
   /// executable returns a non-zero exit code.
+  ///
+  /// These are the raw bytes emitted by the subprocess. Line endings are
+  /// platform-native (for example, `\r\n` on Windows and `\n` on Unix).
   Future<Uint8List> get outputBytes async {
     final result = await collectBytes(stdout);
     await done;

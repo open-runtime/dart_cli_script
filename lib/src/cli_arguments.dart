@@ -64,6 +64,41 @@ class CliArguments {
     while (scanner.scanChar($space)) {}
   }
 
+  /// Glob characters that can be escaped with a backslash.
+  static const _globEscapedChars = {
+    $asterisk,
+    $question,
+    $lbracket,
+    $rbracket,
+    $lbrace,
+    $rbrace,
+    $lparen,
+    $rparen,
+    $comma,
+    $dash,
+    $backslash,
+  };
+
+  /// Returns whether [pattern] is likely an absolute Windows path glob.
+  ///
+  /// We only normalize absolute Windows-style paths so we don't corrupt
+  /// shell-style escaped glob characters like `\\*.txt`.
+  static bool _isLikelyWindowsAbsolutePathGlob(String pattern) {
+    if (!Platform.isWindows || pattern.isEmpty) return false;
+    if (RegExp(r'^[A-Za-z]:[\\/]').hasMatch(pattern)) return true;
+    if (pattern.startsWith(r'\\') || pattern.startsWith('//')) return true;
+    if (pattern.codeUnitAt(0) == $backslash && pattern.length > 1) {
+      return !_globEscapedChars.contains(pattern.codeUnitAt(1));
+    }
+    return false;
+  }
+
+  /// Normalizes a glob pattern to POSIX separators for the glob package.
+  ///
+  /// `package:glob` expects `/` as path separators on all platforms.
+  static String _normalizeGlobPattern(String pattern) =>
+      _isLikelyWindowsAbsolutePathGlob(pattern) ? pattern.replaceAll('\\', '/') : pattern;
+
   /// Scans a single argument.
   static _Argument _scanArg(StringScanner scanner, {required bool glob}) {
     final plainBuffer = StringBuffer();
@@ -73,7 +108,7 @@ class CliArguments {
       final next = scanner.peekChar();
       if (next == $space || next == null) {
         final glob = isGlobActive ? globBuffer?.toString() : null;
-        return _Argument(plainBuffer.toString(), glob == null ? null : Glob(glob));
+        return _Argument(plainBuffer.toString(), glob == null ? null : Glob(_normalizeGlobPattern(glob)));
       } else if (next == $double_quote || next == $single_quote) {
         scanner.readChar();
 
@@ -157,7 +192,9 @@ class _Argument {
   Future<List<String>> resolve({String? root}) async {
     final glob = _glob;
     if (glob != null) {
-      final absolute = p.isAbsolute(glob.pattern);
+      final absolute = Platform.isWindows
+          ? CliArguments._isLikelyWindowsAbsolutePathGlob(glob.pattern)
+          : p.isAbsolute(glob.pattern);
       final globbed = [
         await for (final entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root),
       ];
