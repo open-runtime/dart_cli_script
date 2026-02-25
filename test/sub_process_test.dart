@@ -18,6 +18,7 @@ import 'dart:io';
 
 import 'package:cli_script/cli_script.dart';
 import 'package:test/test.dart';
+import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'fake_stream_consumer.dart';
 import 'util.dart';
@@ -171,13 +172,63 @@ void main() {
       test('includes minimum Windows system environment needed to spawn', () async {
         final subprocessEnv = await _getSubprocessEnvironment(includeParentEnvironment: false);
         final systemRoot = Platform.environment['SystemRoot'] ?? Platform.environment['SYSTEMROOT'];
-        if (systemRoot != null && systemRoot.isNotEmpty) {
-          expect(_lookupEnvValue(subprocessEnv, 'SystemRoot'), equals(systemRoot));
-        }
         final winDir = Platform.environment['WINDIR'];
-        if (winDir != null && winDir.isNotEmpty) {
-          expect(_lookupEnvValue(subprocessEnv, 'WINDIR'), equals(winDir));
+        if (systemRoot == null || systemRoot.isEmpty || winDir == null || winDir.isEmpty) {
+          markTestSkipped('SystemRoot or WINDIR not available in parent environment');
         }
+        expect(_lookupEnvValue(subprocessEnv, 'SystemRoot'), equals(systemRoot));
+        expect(_lookupEnvValue(subprocessEnv, 'WINDIR'), equals(winDir));
+      }, testOn: 'windows');
+
+      test('with runInShell: true does not add PATH or COMSPEC when includeParentEnvironment: false', () async {
+        // When runInShell is true, the process is invoked via the system shell
+        // (cmd.exe on Windows). The implementation only adds SystemRoot and
+        // WINDIR to the minimal base env; PATH and COMSPEC are not added.
+        // This documents that shell-invoked subprocesses with an empty env
+        // will NOT inherit PATH/COMSPEC from the parent.
+        final systemRoot = Platform.environment['SystemRoot'] ?? Platform.environment['SYSTEMROOT'];
+        final winDir = Platform.environment['WINDIR'];
+        if (systemRoot == null || systemRoot.isEmpty || winDir == null || winDir.isEmpty) {
+          markTestSkipped('SystemRoot or WINDIR not available in parent environment');
+        }
+        final subprocessEnv = await _getSubprocessEnvironment(includeParentEnvironment: false, runInShell: true);
+        expect(_containsEnvKey(subprocessEnv, 'PATH'), isFalse);
+        expect(_containsEnvKey(subprocessEnv, 'COMSPEC'), isFalse);
+        // Positive assertions: SystemRoot and WINDIR must be present when
+        // available in the parent (required for spawning on Windows).
+        expect(_lookupEnvValue(subprocessEnv, 'SystemRoot'), equals(systemRoot));
+        expect(_lookupEnvValue(subprocessEnv, 'WINDIR'), equals(winDir));
+      }, testOn: 'windows');
+
+      test('Windows env key collision: case variants in overrides collapse to single value', () async {
+        // Exercise the case-collision path: pass both case variants of a key.
+        // Use the same value for both so the outcome is deterministic and does
+        // not rely on _lookupEnvValue first/last ambiguity or OS duplicate-key
+        // ordering.
+        const value = 'collision_test_value';
+        final subprocessEnv = await _getSubprocessEnvironment(
+          includeParentEnvironment: false,
+          environment: {'SystemRoot': value, 'SYSTEMROOT': value},
+        );
+        expect(_lookupEnvValue(subprocessEnv, 'SystemRoot'), equals(value));
+      }, testOn: 'windows');
+
+      test('environment parameter is merged with Windows base env (SystemRoot, WINDIR)', () async {
+        // When includeParentEnvironment is false, custom env vars are merged
+        // with the Windows base (SystemRoot, WINDIR). Both must be present.
+        final systemRoot = Platform.environment['SystemRoot'] ?? Platform.environment['SYSTEMROOT'];
+        final winDir = Platform.environment['WINDIR'];
+        if (systemRoot == null || systemRoot.isEmpty || winDir == null || winDir.isEmpty) {
+          markTestSkipped('SystemRoot or WINDIR not available in parent environment');
+        }
+        final varName = uid();
+        final subprocessEnv = await _getSubprocessEnvironment(
+          includeParentEnvironment: false,
+          environment: {varName: 'custom'},
+        );
+        expect(_lookupEnvValue(subprocessEnv, varName), equals('custom'));
+        expect(_lookupEnvValue(subprocessEnv, 'SystemRoot'), equals(systemRoot));
+        expect(_lookupEnvValue(subprocessEnv, 'WINDIR'), equals(winDir));
       }, testOn: 'windows');
     });
   });
@@ -263,17 +314,43 @@ void stdoutOrStderr(String name, Stream<List<int>> Function(Script script) strea
 Future<Map<String, String>> _getSubprocessEnvironment({
   Map<String, String>? environment,
   bool includeParentEnvironment = true,
-}) async =>
-    (json.decode(
-              await mainScript(
-                'stdout.writeln(json.encode(Platform.environment));',
-                environment: environment,
-                includeParentEnvironment: includeParentEnvironment,
-              ).stdout.text,
-            )
-            as Map)
-        .cast<String, String>();
+  bool runInShell = false,
+}) async {
+  if (runInShell) {
+    final scriptPath = d.path('env_shell_${uid()}.dart');
+    File(scriptPath).writeAsStringSync('''
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+Future<void> main() async {
+  stdout.writeln(json.encode(Platform.environment));
+}
+''');
+    final script = Script(
+      arg(Platform.resolvedExecutable),
+      args: [...Platform.executableArguments, scriptPath],
+      environment: environment,
+      includeParentEnvironment: includeParentEnvironment,
+      runInShell: runInShell,
+    );
+    final jsonStr = await script.stdout.text;
+    await script.done;
+    return (json.decode(jsonStr) as Map).cast<String, String>();
+  }
+  return (json.decode(
+            await mainScript(
+              'stdout.writeln(json.encode(Platform.environment));',
+              environment: environment,
+              includeParentEnvironment: includeParentEnvironment,
+            ).stdout.text,
+          )
+          as Map)
+      .cast<String, String>();
+}
+
+/// Looks up an env value; on Windows uses case-insensitive matching because
+/// the OS treats env keys case-insensitively.
 String? _lookupEnvValue(Map<String, String> map, String key) {
   if (!Platform.isWindows) return map[key];
   for (final entry in map.entries) {
@@ -282,6 +359,8 @@ String? _lookupEnvValue(Map<String, String> map, String key) {
   return null;
 }
 
+/// Checks for env key presence; on Windows uses case-insensitive matching
+/// because the OS treats env keys case-insensitively.
 bool _containsEnvKey(Map<String, String> map, String key) {
   if (!Platform.isWindows) return map.containsKey(key);
   return map.keys.any((k) => k.toUpperCase() == key.toUpperCase());

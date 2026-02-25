@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:io';
+
 import 'package:cli_script/src/cli_arguments.dart';
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
@@ -150,7 +152,8 @@ void main() {
         await d.file('bar.txt').create();
         await d.file('baz.zip').create();
 
-        final pattern = p.join(Glob.quote(d.sandbox), '*.txt');
+        final base = d.sandbox.replaceAll(Platform.pathSeparator, '/');
+        final pattern = '${Glob.quote(base)}/*.txt';
         final args = await _resolve('ls $pattern', glob: glob);
         expect(args.first, equals('ls'));
         expect(args.sublist(1), unorderedEquals([d.path('foo.txt'), d.path('bar.txt')]));
@@ -173,7 +176,89 @@ void main() {
       test("returns plain strings for globs that don't match", () async {
         expect(await _resolve('ls *.txt', glob: glob), equals(['ls', '*.txt']));
       });
+
+      test('absolute glob output uses platform path separators', () async {
+        await d.file('foo.txt').create();
+        await d.file('bar.txt').create();
+
+        final base = d.sandbox.replaceAll(Platform.pathSeparator, '/');
+        final pattern = '${Glob.quote(base)}/*.txt';
+        final args = await _resolve('ls $pattern', glob: glob);
+        expect(args.first, equals('ls'));
+        for (final path in args.sublist(1)) {
+          expect(path, matches(Platform.isWindows ? RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\|//|[\\/])') : RegExp(r'^/')));
+        }
+        expect(args.sublist(1), unorderedEquals([d.path('foo.txt'), d.path('bar.txt')]));
+      });
     });
+
+    group('Windows-specific glob patterns', () {
+      group('UNC-style absolute glob', () {
+        test('returns plain pattern when UNC path does not match', () async {
+          await d.file('foo.txt').create();
+          const uncPattern = r'\\nonexistent\share\*.txt';
+          final args = await _resolve('ls $uncPattern', glob: true);
+          expect(args.first, equals('ls'));
+          expect(args.sublist(1), equals([uncPattern]));
+          expect(args.sublist(1).single, startsWith(r'\\'));
+        }, testOn: 'windows');
+
+        test('//server/share form returns plain pattern when no match', () async {
+          await d.file('foo.txt').create();
+          const uncPattern = '//server/share/*.txt';
+          final args = await _resolve('ls $uncPattern', glob: true);
+          expect(args.first, equals('ls'));
+          expect(args.sublist(1), equals([uncPattern]));
+          expect(args.sublist(1).single, startsWith('//'));
+        }, testOn: 'windows');
+      });
+
+      group('drive-relative glob pattern', () {
+        test('C:foo\\*.txt returns plain pattern when no match', () async {
+          await d.file('foo.txt').create();
+          const pattern = r'C:foo\*.txt';
+          final args = await _resolve('ls $pattern', glob: true);
+          expect(args.first, equals('ls'));
+          expect(args.sublist(1), equals([pattern]));
+        }, testOn: 'windows');
+
+        test('C:foo/*.txt returns plain pattern when no match', () async {
+          await d.file('foo.txt').create();
+          const pattern = 'C:foo/*.txt';
+          final args = await _resolve('ls $pattern', glob: true);
+          expect(args.first, equals('ls'));
+          expect(args.sublist(1), equals([pattern]));
+        }, testOn: 'windows');
+      });
+
+      group('Glob.quote-style drive prefix escaping', () {
+        test('C\\:\\path\\*.txt pattern normalizes and expands correctly', () async {
+          await d.file('foo.txt').create();
+          await d.file('bar.txt').create();
+
+          final quotedBase = Glob.quote(d.sandbox);
+          final pattern = '$quotedBase/*.txt';
+          final args = await _resolve('ls $pattern', glob: true);
+          expect(args.first, equals('ls'));
+          expect(args.sublist(1), unorderedEquals([d.path('foo.txt'), d.path('bar.txt')]));
+        }, testOn: 'windows');
+
+        test('quoted Windows absolute path with glob is passed literally', () async {
+          await d.file('foo.txt').create();
+          final quotedPath = '"${d.sandbox.replaceAll(r'\', r'\\')}\\*.txt"';
+          final args = await _resolve('ls $quotedPath', glob: true);
+          expect(args.first, equals('ls'));
+          expect(args.sublist(1).single, equals(p.join(d.sandbox, '*.txt')));
+        }, testOn: 'windows');
+      });
+
+      test('UNC path with glob: false passes through literally', () async {
+        const uncPattern = r'\\server\share\*.txt';
+        final args = await _resolve('ls $uncPattern', glob: false);
+        expect(args.first, equals('ls'));
+        expect(args.sublist(1), equals([uncPattern]));
+      });
+    }, testOn: 'windows');
 
     onWindowsOrWithGlobFalse((glob) {
       test('ignores glob characters', () async {
