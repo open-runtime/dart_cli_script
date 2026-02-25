@@ -217,7 +217,8 @@ class _Argument {
           ? CliArguments._isLikelyWindowsAbsolutePathGlob(glob.pattern)
           : p.isAbsolute(glob.pattern);
       final globbed = [
-        await for (final entity in glob.list(root: root)) absolute ? entity.path : p.relative(entity.path, from: root),
+        await for (final entity in glob.list(root: root))
+          absolute ? p.normalize(entity.path) : p.relative(entity.path, from: root),
       ];
       if (globbed.isNotEmpty) return globbed;
     }
