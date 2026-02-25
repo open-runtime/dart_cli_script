@@ -1,5 +1,5 @@
 name: cli_script
-version: 1.0.11
+version: 1.0.12
 description: Write scripts that call subprocesses with the ease of shell scripting and the power of Dart.
 repository: https://github.com/open-runtime/dart_cli_script
 environment:

@@ -1,0 +1,19 @@
+{
+  "pull_requests": [
+    {
+      "number": 5,
+      "title": "fix: complete Windows compatibility for glob and subprocess tests",
+      "author": "tsavo-at-pieces",
+      "labels": [],
+      "summary": "Fixes Windows absolute glob pattern handling in ls() and CliArguments, and hardens subprocess environment behavior by including SystemRoot and WINDIR when includeParentEnvironment is false.",
+      "commits": [
+        "6ea98305eda06d8edf665806a3ecc06d7f7703c2",
+        "451c81d2a2742cb1c28e3284d021efd7df2f67f7",
+        "2ff616cb3b8d874262ca31489c21ac53f150d36a",
+        "8ffb6c9d59b2c351ca50bdbf11c29f696788164c",
+        "ad0ad96767be37263e02a5c34a8dce12b0b0518d",
+        "ac233f96b783075d9b4823c50b5cdef04330d17e"
+      ]
+    }
+  ]
+}

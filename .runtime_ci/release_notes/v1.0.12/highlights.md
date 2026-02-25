@@ -1,0 +1,3 @@
+- Fixed subprocess spawning crashes on Windows when `includeParentEnvironment: false` is used.
+- Resolved absolute glob pattern expansion issues for Windows drive paths.
+- Hardened parsing for escaped glob characters and UNC paths on Windows.

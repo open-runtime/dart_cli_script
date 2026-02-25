@@ -342,7 +342,7 @@ ${arg(source)} build/")`.
 
 ##### Globs
 
-On Linux and Mac OS, the `executableAndArgs` string also automatically performs
+The `executableAndArgs` string also automatically performs
 glob expansions. This means it takes arguments like `*.txt` and expands them
 into a list of all matching files. It uses Dart's [`glob` package] to expand
 these globs, so it uses the same [syntax] as that package.

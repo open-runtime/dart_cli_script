@@ -1,0 +1,64 @@
+{
+  "version": "1.0.12",
+  "previous_version": "v1.0.11",
+  "total_commits": 12,
+  "categories": {
+    "added": [
+      {
+        "description": "Add deep Windows path and environment regression coverage",
+        "pr": "#5",
+        "commits": [
+          "8ffb6c9d59b2c351ca50bdbf11c29f696788164c"
+        ]
+      }
+    ],
+    "changed": [
+      {
+        "description": "Update runtime_ci_tooling to v0.14.1 and expand autodoc coverage",
+        "pr": null,
+        "commits": [
+          "4d9de918fac68838f20a0217bc5cdb6c4c69c60a",
+          "d5922d00034b6a48e1fa8e5e60924f4216a746e5",
+          "07105960bad275462db09f20b971a53afbf6493c",
+          "b1b641af9d97f09fa42c0c4749cd9d2852518aa4"
+        ]
+      },
+      {
+        "description": "Update dependency versions for workspace compatibility",
+        "pr": null,
+        "commits": [
+          "ad70a7693200ce3e432d73169e561c66539844d7"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [
+      {
+        "description": "Normalize absolute glob output and handle escaped Windows absolute glob patterns in CliArguments",
+        "pr": "#5",
+        "commits": [
+          "2ff616cb3b8d874262ca31489c21ac53f150d36a",
+          "451c81d2a2742cb1c28e3284d021efd7df2f67f7"
+        ]
+      },
+      {
+        "description": "Complete Windows compatibility for glob and subprocess tests, hardening environment handling on Windows",
+        "pr": "#5",
+        "commits": [
+          "6ea98305eda06d8edf665806a3ecc06d7f7703c2",
+          "ad0ad96767be37263e02a5c34a8dce12b0b0518d",
+          "ac233f96b783075d9b4823c50b5cdef04330d17e"
+        ]
+      },
+      {
+        "description": "Stabilize Windows CI behavior and test expectations",
+        "pr": null,
+        "commits": [
+          "90adf821e693ed1aa558744a84cf861c1fa99258"
+        ]
+      }
+    ],
+    "security": []
+  }
+}

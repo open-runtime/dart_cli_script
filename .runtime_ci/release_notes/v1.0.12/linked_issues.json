@@ -1,0 +1,8 @@
+{
+  "version": "1.0.12",
+  "github_issues": [],
+  "sentry_issues": [],
+  "prs_referenced": [
+    {"number": 5, "title": "fix: complete Windows compatibility for glob and subprocess tests", "author": "tsavo-at-pieces"}
+  ]
+}
