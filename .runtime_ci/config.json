@@ -16,10 +16,25 @@
       "format_check": true,
       "analysis_cache": true,
       "managed_analyze": true,
-      "managed_test": true
+      "managed_test": true,
+      "build_runner": false
     },
     "secrets": {},
-    "sub_packages": []
+    "sub_packages": [],
+    "_comment_platforms": "Optional: CI platform matrix. When 2+ entries are provided, CI splits into analyze + matrix test jobs.",
+    "platforms": [
+      "ubuntu-x64",
+      "ubuntu-arm64",
+      "macos-arm64",
+      "macos-x64",
+      "windows-x64",
+      "windows-arm64"
+    ],
+    "_comment_runner_overrides": "Optional: override platform IDs to custom runs-on labels (e.g. org-managed GitHub-hosted runners). Keys must match ci.platforms entries.",
+    "runner_overrides": {
+      "ubuntu-arm64": "runtime-ubuntu-24.04-arm64-208gb-64core",
+      "windows-arm64": "runtime-windows-11-arm64-208gb-64core"
+    }
   },
   "gcp": {
     "project": ""
