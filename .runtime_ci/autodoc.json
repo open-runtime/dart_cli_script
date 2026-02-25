@@ -18,8 +18,8 @@
         "api_reference",
         "examples"
       ],
-      "hash": "9f9c50c15b729092e552dd353407f0f44b3739ec2aeed9bae1a4ef1a36015d64",
-      "last_updated": "2026-02-24T01:17:38.406612Z"
+      "hash": "22c79f5fe9fbb7d36bbfc7b956b0b057864c94c5a2526d0804ac8eddd161c0ab",
+      "last_updated": "2026-02-25T03:42:26.194943Z"
     },
     {
       "id": "extensions",
@@ -36,8 +36,8 @@
         "api_reference",
         "examples"
       ],
-      "hash": "5d55f97315e3686b437b3fe0147319ab207dafa966e8fd5e42baa812935558ee",
-      "last_updated": "2026-02-22T22:18:04.580615Z"
+      "hash": "b12619865b09489df7e2f32433d8df34123ce28fd251bb0e1ff22beb5908c09b",
+      "last_updated": "2026-02-25T03:42:26.198580Z"
     },
     {
       "id": "util",
@@ -54,8 +54,8 @@
         "api_reference",
         "examples"
       ],
-      "hash": "",
-      "last_updated": null
+      "hash": "5120abc9dd5726578e0770b472bac95dd9319b5658b034aa211d458207d2bf21",
+      "last_updated": "2026-02-25T03:42:26.199374Z"
     },
     {
       "id": "top_level",
@@ -72,8 +72,8 @@
         "api_reference",
         "examples"
       ],
-      "hash": "",
-      "last_updated": null
+      "hash": "dd5a578ab761034073c86e28b33a200c3f91526348ac280d65a3920700a14802",
+      "last_updated": "2026-02-25T03:42:26.203684Z"
     }
   ],
   "templates": {
