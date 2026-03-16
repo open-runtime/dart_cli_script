@@ -1,4 +1,4 @@
-include: package:runtime_common_codestyle/recommended.yaml
+include: package:lints/recommended.yaml
 
 analyzer:
   errors:
