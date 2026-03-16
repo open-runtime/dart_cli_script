@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.13] - 2026-03-16
+
+### Changed
+- Replaced the shared runtime_common_codestyle dependency with a local lints baseline to ensure clean analysis with managed CI tooling dependency range.
+
 ## [1.0.12] - 2026-02-25
 
 ### Added
@@ -210,6 +215,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Initial release.
 
+[1.0.13]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.12...v1.0.13
 [1.0.12]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.11...v1.0.12
 [1.0.11]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/open-runtime/dart_cli_script/compare/v1.0.9...v1.0.10

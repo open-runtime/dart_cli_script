@@ -1,0 +1,2 @@
+- Replaced the `runtime_common_codestyle` analyzer inclusion with a standard local `lints` baseline.
+- Updated the `runtime_ci_tooling` dependency range constraint for better workspace compatibility.

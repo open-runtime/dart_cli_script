@@ -1,0 +1,8 @@
+- **Decision**: patch. The changes consist entirely of development environment configuration and tooling updates, which do not modify the package's public API surface or runtime behavior.
+- **Key Changes**:
+  - Replaced the `runtime_common_codestyle` analyzer inclusion with local `lints/recommended.yaml` in `analysis_options.yaml`.
+  - Added `lints` as a `dev_dependency` in `pubspec.yaml`.
+  - Updated the `runtime_ci_tooling` dev_dependency range constraint.
+- **Breaking Changes**: None.
+- **New Features**: None.
+- **References**: Commit "chore: replace runtime_common_codestyle with local lints"

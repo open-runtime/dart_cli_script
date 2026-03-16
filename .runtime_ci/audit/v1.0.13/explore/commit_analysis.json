@@ -1,0 +1,21 @@
+{
+  "version": "1.0.13",
+  "previous_version": "v1.0.12",
+  "total_commits": 1,
+  "categories": {
+    "added": [],
+    "changed": [
+      {
+        "description": "Replaced the shared runtime_common_codestyle dependency with a local lints baseline to ensure clean analysis with managed CI tooling dependency range.",
+        "pr": null,
+        "commits": [
+          "a916a1fa81b61c80c6a5f31f2010e9830d2f42cb"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [],
+    "security": []
+  }
+}
