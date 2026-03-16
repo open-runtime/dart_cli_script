@@ -12,14 +12,14 @@
       "lib_paths": [
         "lib/src/"
       ],
-      "output_path": "docs/core/",
+      "output_path": "docs/core",
       "generate": [
         "quickstart",
         "api_reference",
         "examples"
       ],
-      "hash": "22c79f5fe9fbb7d36bbfc7b956b0b057864c94c5a2526d0804ac8eddd161c0ab",
-      "last_updated": "2026-02-25T03:42:26.194943Z"
+      "hash": "921fa793fcf90fbefbf79265ed9daf54826bc4fe4c67ac9d3c667851d88cd8c4",
+      "last_updated": "2026-03-16T01:30:39.489156Z"
     },
     {
       "id": "extensions",
@@ -30,14 +30,14 @@
       "lib_paths": [
         "lib/src/extensions/"
       ],
-      "output_path": "docs/extensions/",
+      "output_path": "docs/extensions",
       "generate": [
         "quickstart",
         "api_reference",
         "examples"
       ],
-      "hash": "b12619865b09489df7e2f32433d8df34123ce28fd251bb0e1ff22beb5908c09b",
-      "last_updated": "2026-02-25T03:42:26.198580Z"
+      "hash": "dda2606e065c9389d580b0fe3e5ef013f830c15d9e4f3bd00728470939e57ec6",
+      "last_updated": "2026-03-16T01:30:39.494414Z"
     },
     {
       "id": "util",
@@ -48,14 +48,14 @@
       "lib_paths": [
         "lib/src/util/"
       ],
-      "output_path": "docs/util/",
+      "output_path": "docs/util",
       "generate": [
         "quickstart",
         "api_reference",
         "examples"
       ],
-      "hash": "5120abc9dd5726578e0770b472bac95dd9319b5658b034aa211d458207d2bf21",
-      "last_updated": "2026-02-25T03:42:26.199374Z"
+      "hash": "041e7e88b4e693d871d545939bf9ef6370922b6ae1abbd37c887edcd8ef3820d",
+      "last_updated": "2026-03-16T01:30:39.495795Z"
     },
     {
       "id": "top_level",
@@ -66,14 +66,14 @@
       "lib_paths": [
         "lib/"
       ],
-      "output_path": "docs/",
+      "output_path": "docs",
       "generate": [
         "quickstart",
         "api_reference",
         "examples"
       ],
-      "hash": "dd5a578ab761034073c86e28b33a200c3f91526348ac280d65a3920700a14802",
-      "last_updated": "2026-02-25T03:42:26.203684Z"
+      "hash": "27ac37652d52af96154f8ff469dc076867935a576b49bdb73dbba6ad41c5ecbf",
+      "last_updated": "2026-03-16T01:30:39.498916Z"
     }
   ],
   "templates": {
