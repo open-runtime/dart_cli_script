@@ -308,9 +308,9 @@ jobs:
           retention-days: 1
 
   # ============================================================================
-  # Job 4: Stage 2 -- Composer Agent + Documentation
+  # Job 4: Stage 2 -- Prepare Release Docs (Composer Agent + Documentation)
   # ============================================================================
-  compose-artifacts:
+  prepare-release-docs:
     needs: [determine-version, explore-changes]
     if: needs.determine-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
@@ -393,7 +393,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: composed-artifacts
+          name: release-docs
           path: |
             CHANGELOG.md
             README.md
@@ -403,7 +403,7 @@ jobs:
       - name: Upload CI/CD audit trail
         uses: actions/upload-artifact@v7
         with:
-          name: cicd-audit-compose
+          name: cicd-audit-prepare-release-docs
           path: .runtime_ci/runs/
           if-no-files-found: ignore
           retention-days: 1
@@ -525,7 +525,7 @@ jobs:
   # Job 6: Stage 3 -- Release Notes Author
   # ============================================================================
   release-notes:
-    needs: [determine-version, explore-changes, pre-release-triage, compose-artifacts, autodoc]
+    needs: [determine-version, explore-changes, pre-release-triage, prepare-release-docs, autodoc]
     if: needs.determine-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -585,7 +585,7 @@ jobs:
 
       - uses: actions/download-artifact@v8
         with:
-          name: composed-artifacts
+          name: release-docs
           path: ./artifacts/
 
       - uses: actions/download-artifact@v8
@@ -599,14 +599,27 @@ jobs:
           name: autodoc-artifacts
           path: ./autodoc-artifacts/
 
-      # Copy CHANGELOG from compose stage so release notes can reference it
-      - name: Apply compose artifacts
+      # Copy artifacts from earlier pipeline stages into the working tree so
+      # the release-notes command can read them as local files / @includes.
+      - name: Apply pipeline artifacts
         run: |
+          # CHANGELOG + README from prepare-release-docs
           if [ -f ./artifacts/CHANGELOG.md ]; then
             cp ./artifacts/CHANGELOG.md ./CHANGELOG.md
           fi
           if [ -f ./artifacts/README.md ]; then
             cp ./artifacts/README.md ./README.md
+          fi
+
+          # Autodoc-generated module docs (docs/ + autodoc.json)
+          if [ -d ./autodoc-artifacts/docs ]; then
+            cp -r ./autodoc-artifacts/docs/ ./docs/
+            echo "Applied autodoc docs/ to working tree"
+          fi
+          if [ -f ./autodoc-artifacts/.runtime_ci/autodoc.json ]; then
+            mkdir -p .runtime_ci
+            cp ./autodoc-artifacts/.runtime_ci/autodoc.json .runtime_ci/autodoc.json
+            echo "Applied autodoc.json to working tree"
           fi
 
       - name: Stage 3 Release Notes Author
@@ -666,7 +679,7 @@ jobs:
   # Job 7: Create Release
   # ============================================================================
   create-release:
-    needs: [determine-version, compose-artifacts, release-notes]
+    needs: [determine-version, prepare-release-docs, release-notes]
     if: needs.determine-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -707,7 +720,12 @@ jobs:
 
       - uses: actions/download-artifact@v8
         with:
-          name: composed-artifacts
+          name: release-docs
+          path: ./artifacts/
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: autodoc-artifacts
           path: ./artifacts/
 
       - uses: actions/download-artifact@v8
