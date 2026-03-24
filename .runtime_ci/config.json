@@ -1,6 +1,6 @@
 {
   "repository": {
-    "name": "cli_script",
+    "name": "dart_cli_script",
     "owner": "open-runtime",
     "triaged_label": "triaged",
     "changelog_path": "CHANGELOG.md",
