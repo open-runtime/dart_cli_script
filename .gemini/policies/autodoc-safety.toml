@@ -1,0 +1,34 @@
+# Autodoc Safety Policy — Restricts file edits to markdown only.
+#
+# When Gemini runs during `manage_cicd autodoc` or `manage_cicd documentation`,
+# it should only edit .md files. This policy prevents accidental edits to source
+# code, config files, or generated code.
+#
+# Workspace tier (tier 3) — overridden by user (tier 4) and admin (tier 5) policies.
+
+# Allow write_file and replace for .md files only
+[[rule]]
+toolName = ["write_file", "replace"]
+decision = "allow"
+priority = 100
+argsPattern = "\"file_path\":\"[^\"]*\\.md\""
+
+# Deny write_file and replace for all non-.md files
+[[rule]]
+toolName = ["write_file", "replace"]
+decision = "deny"
+priority = 90
+deny_message = "Autodoc safety: only .md files may be edited. Source code and config files are read-only."
+
+# Allow all read operations unconditionally
+[[rule]]
+toolName = ["read_file", "read_many_files", "glob", "grep_search", "list_directory"]
+decision = "allow"
+priority = 100
+
+# Allow shell commands that are read-only (git, tree, find, grep, etc.)
+[[rule]]
+toolName = ["run_shell_command"]
+decision = "allow"
+priority = 80
+argsPattern = "\"command\":\"(git|tree|find|grep|wc|sort|head|tail|cat|ls|echo|jq|dart run)"
