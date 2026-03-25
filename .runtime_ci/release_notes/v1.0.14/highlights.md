@@ -1,0 +1,5 @@
+- Fixed a bug breaking standalone CI by removing an accidental `resolution: workspace` constraint from the pubspec.
+- Resolved cross-repo Git dependency clone issues in CI by transitioning to a personal access token.
+- Upgraded CI workflows to the latest `runtime_ci_tooling` and bumped `setup-dart` to v1.7.2.
+- Removed `runtime_ci_tooling` from `dev_dependencies` in favor of global tool activation.
+- Enabled autodoc capabilities and introduced a new autodoc safety policy using `gemini-3-flash-preview`.

@@ -1,0 +1,83 @@
+{
+  "version": "1.0.14",
+  "previous_version": "v1.0.13",
+  "total_commits": 13,
+  "categories": {
+    "added": [
+      {
+        "description": "Enabled autodoc feature flag and regenerated workflows for automated documentation runs",
+        "pr": null,
+        "commits": [
+          "6255fb4e24750f88c841d03616f691ef1ab49baa"
+        ]
+      },
+      {
+        "description": "Added autodoc safety policy and updated gemini settings from runtime_ci_tooling v0.23.10",
+        "pr": null,
+        "commits": [
+          "c7046a95650a131e58bb17c70c3c6e08c16403b6"
+        ]
+      }
+    ],
+    "changed": [
+      {
+        "description": "Upgraded runtime_ci_tooling templates up to v0.23.11, removing it as a dev_dependency in favor of global activation",
+        "pr": null,
+        "commits": [
+          "2e5071fb5672531ad6e3e1857a2b3ecbad7d2ca2",
+          "41cf534f86f76f0a040c4a87305f8ae5f323aa9a",
+          "424c0755be6f51e1cf32faa263823f580ae98faa",
+          "7620b9328392fd70c58978ddd9a09d4e69f614ae",
+          "a64b53496db92a92545435ae0f34020d294a4998"
+        ]
+      },
+      {
+        "description": "Bumped setup-dart action to v1.7.2 in CI workflows",
+        "pr": null,
+        "commits": [
+          "706f09b85d7fd52ada8ed8b5913197b961a8da72"
+        ]
+      },
+      {
+        "description": "Configured gemini-3-flash-preview as the review model for autodoc",
+        "pr": null,
+        "commits": [
+          "9d93b772a0a1f835d2684347df46af60b52da3f4"
+        ]
+      },
+      {
+        "description": "Aligned Dart workspace resolution and dependency constraints in pubspec",
+        "pr": null,
+        "commits": [
+          "ab6b996c59563b74520345e98f7ad4c314a1e052"
+        ]
+      }
+    ],
+    "deprecated": [],
+    "removed": [],
+    "fixed": [
+      {
+        "description": "Removed accidental 'resolution: workspace' from pubspec.yaml that broke standalone CI",
+        "pr": null,
+        "commits": [
+          "8ce1f05cf5de6fd87cf082c5a2f6fbb5bac54abb"
+        ]
+      },
+      {
+        "description": "Corrected repository name from cli_script to dart_cli_script in config.json",
+        "pr": null,
+        "commits": [
+          "ae4be9f4341543e598baa6e932b56d14e67df3ab"
+        ]
+      },
+      {
+        "description": "Switched to using TSAVO_AT_PIECES_PERSONAL_ACCESS_TOKEN to properly clone cross-repo git dependencies in CI",
+        "pr": null,
+        "commits": [
+          "1acd295618cbf42faa8847b4cfce4f4ade3bb991"
+        ]
+      }
+    ],
+    "security": []
+  }
+}

@@ -7,6 +7,8 @@ At the same time, it uses standard Dart idioms like exceptions, `Stream`s, and
 `Future`s, with a few extensions to make them extra easy to work with in a
 scripting context.
 
+* [Installation](#installation)
+* [Documentation](#documentation)
 * [Terseness](#terseness)
   * [The `Script` Class](#the-script-class)
   * [Do The Right Thing](#do-the-right-thing)
@@ -17,6 +19,26 @@ scripting context.
   * [Argument Parsing](#argument-parsing)
     * [Globs](#globs)
   * [Search and Replace](#search-and-replace)
+
+## Installation
+
+Add the package to your `pubspec.yaml` to use this library:
+
+```yaml
+dependencies:
+  cli_script: ^1.0.13
+```
+
+## Documentation
+
+Detailed, auto-generated documentation is available for all modules in this package:
+
+<!-- BEGIN AUTODOC -->
+* **Package Entry Points**
+* **Script Core**
+* **Extensions**
+* **Util**
+<!-- END AUTODOC -->
 
 While `cli_script` can be used as a library in any Dart application, its primary
 goal is to support stand-alone scripts that serve the same purpose as shell
@@ -44,7 +66,7 @@ much more nicely than Dart's built-in handling!)
 
 Many programming environments have tried to make themselves suitable for shell
 scripting, but in the end they all fall far short of the ease of calling out to
-subprocesseses in Bash. As such, a principal design goal of `cli_script` is to
+subprocesses in Bash. As such, a principal design goal of `cli_script` is to
 identify the core virtues that make shell scripting so appealing and reproduce
 them as closely as possible in Dart:
 
@@ -152,7 +174,7 @@ process's output.
 ### Pipelining
 
 In shell scripts, it's easy to hook multiple processes together in a pipeline
-where each one passes its output to the next. `cli_script` supports this to,
+where each one passes its output to the next. `cli_script` supports this too,
 using the [`|` operator]. This pipes all stdout from one script into another
 script's stdin and returns a new script that encapsulates both. This new script
 works just like a Bash pipeline with `set -o pipefail`: it forwards the last
@@ -269,7 +291,7 @@ void main() {
 
 In shell scripts, everything is a process. Obviously child processes are
 processes, but functions also have input/output streams and exit codes so that
-they work like processes to. You can even group a block of code into a virtual
+they work like processes too. You can even group a block of code into a virtual
 process using `{}`!
 
 In `cli_script`, anything can be a `Script`. The most common way to make a

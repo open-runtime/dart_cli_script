@@ -1,0 +1,82 @@
+{
+  "command": "merged-audit",
+  "started_at": "2026-03-25T02:14:25.678547",
+  "merged_from": [
+    {
+      "artifact": "cicd-audit-release-notes",
+      "command": "release-notes",
+      "args": [],
+      "started_at": "2026-03-25T02:06:02.714706",
+      "pid": 2909,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-03-25T02-06-02_2909",
+      "ci": true,
+      "completed_at": "2026-03-25T02:14:03.429468",
+      "duration_seconds": 480,
+      "artifacts": [
+        "meta.json",
+        "release-notes/release_notes.md",
+        "release-notes/gemini_response.json",
+        "release-notes/prompt.txt"
+      ]
+    },
+    {
+      "artifact": "cicd-audit-prepare-release-docs",
+      "command": "compose",
+      "args": [],
+      "started_at": "2026-03-25T01:58:29.624608",
+      "pid": 2736,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-03-25T01-58-29_2736",
+      "ci": true,
+      "completed_at": "2026-03-25T01:59:35.619283",
+      "duration_seconds": 65,
+      "artifacts": [
+        "meta.json",
+        "compose/gemini_response.json",
+        "compose/prompt.txt"
+      ]
+    },
+    {
+      "artifact": "cicd-audit-prepare-release-docs",
+      "command": "documentation",
+      "args": [],
+      "started_at": "2026-03-25T01:59:36.047569",
+      "pid": 5142,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-03-25T01-59-36_5142",
+      "ci": true
+    },
+    {
+      "artifact": "cicd-audit-explore",
+      "command": "explore",
+      "args": [],
+      "started_at": "2026-03-25T01:44:46.370887",
+      "pid": 2669,
+      "platform": "linux",
+      "dart_version": "3.9.2",
+      "repo_root": "/home/runner/work/dart_cli_script/dart_cli_script",
+      "run_dir": "/home/runner/work/dart_cli_script/dart_cli_script/.runtime_ci/runs/run_2026-03-25T01-44-46_2669",
+      "ci": true,
+      "completed_at": "2026-03-25T01:57:35.642303",
+      "duration_seconds": 769,
+      "exit_code": 0,
+      "artifacts": [
+        "meta.json",
+        "explore/gemini_response.json",
+        "explore/prompt.txt"
+      ]
+    }
+  ],
+  "artifact_count": 5,
+  "total_files": 18,
+  "ci": true,
+  "platform": "linux",
+  "dart_version": "3.9.2"
+}
