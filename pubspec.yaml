@@ -5,8 +5,6 @@ repository: https://github.com/open-runtime/dart_cli_script
 environment:
   sdk: ^3.9.0
 
-resolution: workspace
-
 dependencies:
   async: ^2.13.0
   charcode: ^1.4.0
